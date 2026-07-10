@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mir Mahadi Abbas · Consulting &amp; Project Analyst</title>
+<meta name="description" content="Mir Mahadi Abbas. MSc Management, Cranfield. Consulting, programme governance and business transformation. Freelance web design, AI automation, workflow automation, dashboards and video editing. Based in Milton Keynes, UK.">
+<meta name="author" content="Mir Mahadi Abbas">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Mir Mahadi Abbas · Consulting &amp; Project Analyst">
+<meta property="og:description" content="MSc Management, Cranfield. Consulting, PMO and business transformation, plus freelance web design, AI automation and workflow projects.">
+<meta property="og:image" content="headshot.jpg">
+<meta name="twitter:card" content="summary">
+
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Styles. tokens.css holds every colour and font; start there for look changes. -->
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/sections.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Mir Mahadi Abbas",
+  "url": "https://mirmahadiabbas.github.io/",
+  "jobTitle": "Consulting & Project Analyst",
+  "address": { "@type": "PostalAddress", "addressLocality": "Milton Keynes", "addressCountry": "GB" },
+  "alumniOf": "Cranfield University",
+  "sameAs": ["https://linkedin.com/in/mirmahadiabbas/"]
+}
+</script>
+</head>
+<body>
+
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<!-- ============ NAV (static: edit links here if section ids change) ============ -->
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#top" class="nav-name">Mir Mahadi <em>Abbas</em></a>
+    <span class="chip-live"><span class="dot" aria-hidden="true"></span>Open to work</span>
+    <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#about">about</a>
+      <a href="#experience">experience</a>
+      <a href="#projects">projects</a>
+      <a href="#services">services</a>
+      <a href="#beyond">beyond the cv</a>
+      <a href="#contact">contact</a>
+      <span class="chip-live"><span class="dot" aria-hidden="true"></span>Open to work</span>
+    </nav>
+  </div>
+</header>
+
+<!-- ============ PAGE (built by js/render.js from js/data.js) ============ -->
+<main id="app">
+  <noscript>
+    <div style="max-width:640px;margin:140px auto;padding:0 28px;font-family:Georgia,serif">
+      <h1>Mir Mahadi Abbas</h1>
+      <p>Consulting and project analyst, MSc Management (Cranfield). Based in Milton Keynes, UK.</p>
+      <p>This site needs JavaScript to render. You can still reach me at
+        <a href="mailto:mirabbasun@gmail.com">mirabbasun@gmail.com</a> or on
+        <a href="https://linkedin.com/in/mirmahadiabbas/">LinkedIn</a>.</p>
+    </div>
+  </noscript>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <span>&copy; <span id="year"></span> Mir Mahadi Abbas</span>
+    <span>Milton Keynes, UK</span>
+  </div>
+</footer>
+
+<!-- ============ LIGHTBOX ============ -->
+<div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image viewer">
+  <button class="lb-close" id="lbClose" aria-label="Close">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+  <button class="lb-arrow lb-prev" id="lbPrev" aria-label="Previous image">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
+  <figure class="lb-figure">
+    <img src="" alt="" id="lbImage">
+    <figcaption class="lb-caption" id="lbCaption"></figcaption>
+  </figure>
+  <button class="lb-arrow lb-next" id="lbNext" aria-label="Next image">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+  </button>
+  <div class="lb-dots" id="lbDots"></div>
+</div>
+
+<!-- Content first, then the builder, then behaviour. Order matters. -->
+<script src="js/data.js"></script>
+<script src="js/render.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
