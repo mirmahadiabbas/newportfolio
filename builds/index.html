@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Builds · Mir Mahadi Abbas</title>
+<meta name="description" content="Live AI and automation experiments by Mir Mahadi Abbas. Try them in your browser: some run locally, some are wired to live AI pipelines.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Builds · Mir Mahadi Abbas">
+<meta property="og:description" content="Live AI and automation experiments you can try, not just read about.">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="builds.css">
+</head>
+<body>
+
+<div class="bwrap">
+  <div class="btop">
+    <a class="btop-name" href="../">Mir Mahadi <em>Abbas</em></a>
+    <a class="bback" href="../">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+      Main site
+    </a>
+  </div>
+
+  <!-- Hub content is built by builds-render.js from builds-data.js -->
+  <main id="bhub">
+    <noscript>
+      <p style="padding:80px 0;font-family:Georgia,serif">
+        This page needs JavaScript. You can reach me at
+        <a href="mailto:mirabbasun@gmail.com" style="text-decoration:underline">mirabbasun@gmail.com</a>.
+      </p>
+    </noscript>
+  </main>
+
+  <footer class="bfoot">
+    <span>&copy; <span id="year"></span> Mir Mahadi Abbas</span>
+    <a href="../">mirmahadiabbas.com</a>
+  </footer>
+</div>
+
+<script src="builds-data.js"></script>
+<script src="builds-render.js"></script>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
