@@ -176,6 +176,45 @@
   </footer>
 </div>
 
+  <!-- ===== Meeting Minutes Service ===== -->
+<section id="minutes-service" style="max-width: 720px; margin: 0 auto; padding: 2rem 1rem;">
+  <h2 style="font-family: 'Fraunces', serif;">Try it: AI Meeting Minutes</h2>
+  <p style="font-family: 'Inter', sans-serif; font-size: 0.95rem;">
+    Paste a meeting transcript and receive a summary email with full minutes
+    attached as a PDF, usually within a couple of minutes.
+  </p>
+
+  <form id="minutesForm" style="display: grid; gap: 0.9rem; font-family: 'Inter', sans-serif;">
+    <input type="text" id="mf_name" placeholder="Your name *" required maxlength="100">
+    <input type="email" id="mf_email" placeholder="Your email *" required maxlength="150">
+    <input type="text" id="mf_title" placeholder="Meeting title *" required maxlength="150">
+    <input type="date" id="mf_date" required>
+    <textarea id="mf_attendees" rows="3" maxlength="1000"
+      placeholder="Attendees, one per line (e.g. Sarah Chen - Finance Lead)"></textarea>
+    <textarea id="mf_transcript" rows="10" maxlength="100000" required
+      placeholder="Paste the meeting transcript here *"></textarea>
+
+    <!-- honeypot: humans never see it, bots fill it -->
+    <input type="text" id="mf_website" autocomplete="off" tabindex="-1"
+      style="position: absolute; left: -9999px;" aria-hidden="true">
+
+    <label style="font-size: 0.85rem; display: flex; gap: 0.5rem; align-items: flex-start;">
+      <input type="checkbox" id="mf_consent" required style="margin-top: 3px;">
+      <span>I have permission to share this transcript. It will be processed via the
+      Anthropic Claude API to generate minutes (not used for AI training) and is not
+      stored after processing.</span>
+    </label>
+
+    <button type="submit" id="mf_button"
+      style="padding: 0.8rem 1.5rem; background: #3d5a45; color: #fff;
+      border: none; border-radius: 6px; cursor: pointer; font-size: 1rem;">
+      Generate minutes
+    </button>
+    <p id="mf_status" style="font-size: 0.9rem; min-height: 1.2rem;"></p>
+  </form>
+</section>
+
+  
 <script>
 (function () {
   'use strict';
@@ -187,6 +226,62 @@
       note.classList.add('show');
     });
   }
+})();
+
+  (function () {
+  var WEBHOOK_URL = "https://hook.eu1.make.com/kul17wrxry5qhetdd28ktgt4pf5mbfy4";
+
+  var form = document.getElementById("minutesForm");
+  var status = document.getElementById("mf_status");
+  var button = document.getElementById("mf_button");
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    // honeypot check: silently drop bots
+    if (document.getElementById("mf_website").value) return;
+
+    var transcript = document.getElementById("mf_transcript").value.trim();
+    if (transcript.length < 500) {
+      status.textContent = "That transcript looks too short to summarise (minimum ~500 characters).";
+      status.style.color = "#a33";
+      return;
+    }
+
+    var payload = {
+      name: document.getElementById("mf_name").value.trim(),
+      email: document.getElementById("mf_email").value.trim(),
+      meeting_title: document.getElementById("mf_title").value.trim(),
+      meeting_date: document.getElementById("mf_date").value,
+      attendees: document.getElementById("mf_attendees").value.trim(),
+      transcript: transcript,
+      source: "mirmahadiabbas.com"
+    };
+
+    button.disabled = true;
+    button.textContent = "Sending...";
+    status.textContent = "";
+
+    fetch(WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify(payload)
+    })
+      .then(function (res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        form.reset();
+        status.textContent = "Done. Check your inbox in the next few minutes (spam folder too, the first time).";
+        status.style.color = "#3d5a45";
+      })
+      .catch(function () {
+        status.textContent = "Something went wrong sending your transcript. Please try again in a minute.";
+        status.style.color = "#a33";
+      })
+      .finally(function () {
+        button.disabled = false;
+        button.textContent = "Generate minutes";
+      });
+  });
 })();
 </script>
 </body>
