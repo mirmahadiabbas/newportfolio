@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meeting Cost Counter · Builds · Mir Mahadi Abbas</title>
+<meta name="description" content="A small in-browser tool: set the headcount, hourly cost and length, and see what a meeting really costs. Includes a live ticker.">
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- shared Builds theme -->
+<link rel="stylesheet" href="../builds.css">
+
+<!-- styles specific to this demo only -->
+<style>
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 26px; }
+  .results { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .live {
+    margin-top: 26px;
+    border: 1px dashed rgba(121, 179, 106, 0.55);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    display: flex; align-items: center; gap: 22px; flex-wrap: wrap;
+  }
+  .live-nums { display: flex; gap: 34px; flex-wrap: wrap; }
+  .live-num { font-family: var(--font-mono); }
+  .live-num b {
+    display: block;
+    font-size: 26px; font-weight: 500;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .live-num.on b { color: var(--brass-deep); }
+  .live-num span {
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--mute);
+  }
+  .bbtn--stop { background: var(--ink); color: var(--ivory); }
+  @media (max-width: 640px) {
+    .grid3, .results { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bwrap">
+  <div class="btop">
+    <a class="btop-name" href="../../">Mir Mahadi <em>Abbas</em></a>
+    <a class="bback" href="../">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+      All builds
+    </a>
+  </div>
+
+  <main class="bpage">
+    <div class="bsheet">
+      <p class="beyebrow">Build 001 · In-browser</p>
+      <h1>Meeting Cost <em>Counter</em></h1>
+      <p class="blead">Every meeting has a price; it just never appears on a screen. Set the room below, or start the live ticker and leave it running while the meeting happens.</p>
+
+      <div class="grid3">
+        <div class="bfield">
+          <label for="people">People in the meeting</label>
+          <input type="number" id="people" min="1" max="500" step="1" value="6">
+        </div>
+        <div class="bfield">
+          <label for="rate">Average hourly cost (£)</label>
+          <input type="number" id="rate" min="0" max="10000" step="1" value="45">
+          <p class="bhint">True cost sits well above salary once overheads are in.</p>
+        </div>
+        <div class="bfield">
+          <label for="mins">Length (minutes)</label>
+          <input type="number" id="mins" min="1" max="1440" step="5" value="60">
+        </div>
+      </div>
+
+      <div class="results">
+        <div class="bresult">
+          <div class="bnum" id="total">£0</div>
+          <div class="blabel">Cost of this meeting</div>
+        </div>
+        <div class="bresult">
+          <div class="bnum" id="perMin">£0</div>
+          <div class="blabel">Cost per minute</div>
+        </div>
+      </div>
+
+      <div class="live">
+        <button class="bbtn bbtn--brass" id="liveBtn">Start live ticker</button>
+        <div class="live-nums" aria-live="polite">
+          <div class="live-num" id="elapsedWrap"><b id="elapsed">00:00</b><span>Elapsed</span></div>
+          <div class="live-num" id="runWrap"><b id="running">£0.00</b><span>Spent so far</span></div>
+        </div>
+      </div>
+
+      <p class="bnote">Cost = people × average hourly cost × time. Change the headcount mid-meeting and the ticker adjusts from that moment, the way it does when someone extra joins the call. Nothing you enter leaves your browser.</p>
+    </div>
+  </main>
+
+  <footer class="bfoot">
+    <span>&copy; <span id="year"></span> Mir Mahadi Abbas</span>
+    <a href="../../">mirmahadiabbas.com</a>
+  </footer>
+</div>
+
+<!-- demo logic, self-contained -->
+<script>
+(function () {
+  'use strict';
+
+  var $ = function (id) { return document.getElementById(id); };
+  var people = $('people'), rate = $('rate'), mins = $('mins');
+  var totalEl = $('total'), perMinEl = $('perMin');
+  var liveBtn = $('liveBtn'), elapsedEl = $('elapsed'), runningEl = $('running');
+
+  function gbp(n, dp) {
+    return n.toLocaleString('en-GB', {
+      style: 'currency', currency: 'GBP',
+      minimumFractionDigits: dp, maximumFractionDigits: dp
+    });
+  }
+  function num(el, fallback) {
+    var v = parseFloat(el.value);
+    return isFinite(v) && v >= 0 ? v : fallback;
+  }
+
+  /* ----- static calculation ----- */
+  function recalc() {
+    var p = num(people, 0), r = num(rate, 0), m = num(mins, 0);
+    var perMinute = p * r / 60;
+    totalEl.textContent = gbp(perMinute * m, perMinute * m >= 100 ? 0 : 2);
+    perMinEl.textContent = gbp(perMinute, 2);
+  }
+  [people, rate, mins].forEach(function (el) {
+    el.addEventListener('input', recalc);
+  });
+  recalc();
+
+  /* ----- live ticker ----- */
+  var timer = null, lastTick = 0, spent = 0, startedAt = 0;
+
+  function tick() {
+    var now = Date.now();
+    // accrue at the CURRENT room rate, so mid-meeting changes count properly
+    spent += (now - lastTick) / 1000 * (num(people, 0) * num(rate, 0) / 3600);
+    lastTick = now;
+
+    var sec = Math.floor((now - startedAt) / 1000);
+    var mm = String(Math.floor(sec / 60)).padStart(2, '0');
+    var ss = String(sec % 60).padStart(2, '0');
+    elapsedEl.textContent = mm + ':' + ss;
+    runningEl.textContent = gbp(spent, 2);
+  }
+
+  liveBtn.addEventListener('click', function () {
+    if (timer) {
+      clearInterval(timer); timer = null;
+      liveBtn.textContent = 'Start live ticker';
+      liveBtn.classList.remove('bbtn--stop');
+      liveBtn.classList.add('bbtn--brass');
+      $('runWrap').classList.remove('on');
+    } else {
+      spent = 0;
+      startedAt = lastTick = Date.now();
+      elapsedEl.textContent = '00:00';
+      runningEl.textContent = gbp(0, 2);
+      timer = setInterval(tick, 250);
+      liveBtn.textContent = 'Stop';
+      liveBtn.classList.remove('bbtn--brass');
+      liveBtn.classList.add('bbtn--stop');
+      $('runWrap').classList.add('on');
+    }
+  });
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+})();
+</script>
+</body>
+</html>
