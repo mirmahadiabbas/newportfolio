@@ -106,77 +106,138 @@
   </footer>
 </div>
 
-<!-- demo logic, self-contained -->
-<script>
-(function () {
-  'use strict';
+<!-- ===== Process Mapper ===== -->
+<section id="process-mapper" style="max-width: 860px; margin: 0 auto; padding: 2rem 1rem;">
+  <h2>Process Description to Process Map</h2>
+  <p style="font-size: 0.95rem;">
+    Describe a business process in plain English. Get back a structured breakdown,
+    a flowchart, and a Lean analysis of where the process may be leaking time.
+    Results appear below, usually within 20 seconds.
+  </p>
 
-  var $ = function (id) { return document.getElementById(id); };
-  var people = $('people'), rate = $('rate'), mins = $('mins');
-  var totalEl = $('total'), perMinEl = $('perMin');
-  var liveBtn = $('liveBtn'), elapsedEl = $('elapsed'), runningEl = $('running');
+  <textarea id="pm_input" rows="10" maxlength="15000"
+    placeholder="Describe the process. For example: When a supplier invoice arrives by email, the finance assistant downloads it and checks whether it quotes a purchase order number..."
+    style="width: 100%; box-sizing: border-box; padding: 0.75rem; font-family: inherit; font-size: 0.95rem;"></textarea>
 
-  function gbp(n, dp) {
-    return n.toLocaleString('en-GB', {
-      style: 'currency', currency: 'GBP',
-      minimumFractionDigits: dp, maximumFractionDigits: dp
+  <!-- honeypot -->
+  <input type="text" id="pm_website" autocomplete="off" tabindex="-1"
+    style="position: absolute; left: -9999px;" aria-hidden="true">
+
+  <div style="display: flex; gap: 0.6rem; align-items: center; margin-top: 0.8rem; flex-wrap: wrap;">
+    <button id="pm_button" type="button"
+      style="padding: 0.75rem 1.4rem; background: #3d5a45; color: #fff; border: none;
+      border-radius: 6px; cursor: pointer; font-size: 1rem;">Analyse process</button>
+    <button id="pm_sample" type="button"
+      style="padding: 0.75rem 1.4rem; background: transparent; color: inherit;
+      border: 1px solid currentColor; border-radius: 6px; cursor: pointer; font-size: 0.9rem;">Load sample</button>
+    <span id="pm_status" style="font-size: 0.9rem;"></span>
+  </div>
+
+  <div id="pm_results" style="display: none; margin-top: 2rem;">
+    <h3 id="pm_name" style="margin-bottom: 0.3rem;"></h3>
+    <p id="pm_summary" style="font-size: 0.95rem;"></p>
+
+    <div id="pm_diagram_wrap" style="margin: 1.5rem 0;">
+      <div id="pm_diagram" style="background: #ffffff; padding: 1rem; border-radius: 8px; overflow-x: auto;"></div>
+      <button id="pm_copy" type="button"
+        style="margin-top: 0.6rem; padding: 0.45rem 0.9rem; background: transparent; color: inherit;
+        border: 1px solid currentColor; border-radius: 5px; cursor: pointer; font-size: 0.85rem;">Copy diagram code</button>
+    </div>
+
+    <div id="pm_sections" style="display: grid; gap: 1.4rem; font-size: 0.93rem;"></div>
+
+    <p style="font-size: 0.8rem; opacity: 0.75; margin-top: 2rem;">
+      Analysis is generated from your description only. Waste and bottleneck items are
+      candidates to confirm with the process owner, not findings.
+    </p>
+  </div>
+</section>
+
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+mermaid.initialize({ startOnLoad: false, theme: 'default' });
+
+const WEBHOOK_URL = "PASTE_YOUR_PROCESS_MAP_WEBHOOK_URL_HERE";
+
+const SAMPLE = `When a supplier invoice arrives by email, the finance assistant downloads it and checks whether it quotes a purchase order number. If there is no PO number, the assistant emails the supplier to request one and waits for the reply. If there is a PO, the assistant opens the ERP and checks the invoice against the purchase order. If the amounts match, the assistant enters the invoice into the ERP and sends it to the finance manager for approval. The manager reviews pending approvals twice a week. If the amounts differ, the assistant emails the procurement team to investigate, and procurement usually reply within three working days. Approved invoices are scheduled for the next payment run, which happens on the last Friday of each month. After scheduling, the assistant saves the invoice PDF to a shared drive folder and also updates a tracking spreadsheet manually.`;
+
+const $ = id => document.getElementById(id);
+const input = $("pm_input"), button = $("pm_button"), status = $("pm_status");
+const results = $("pm_results"), sections = $("pm_sections");
+let currentMermaid = "";
+
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const block = (title, body) => body && body.trim()
+  ? `<div><h4 style="margin:0 0 0.4rem;">${esc(title)}</h4>
+     <div style="white-space:pre-wrap;">${esc(body)}</div></div>` : "";
+
+$("pm_sample").addEventListener("click", () => { input.value = SAMPLE; status.textContent = ""; });
+
+$("pm_copy").addEventListener("click", () => {
+  navigator.clipboard.writeText(currentMermaid);
+  $("pm_copy").textContent = "Copied";
+  setTimeout(() => { $("pm_copy").textContent = "Copy diagram code"; }, 1500);
+});
+
+button.addEventListener("click", async () => {
+  if ($("pm_website").value) return;                 // bot
+  const description = input.value.trim();
+  if (description.length < 200) {
+    status.textContent = "Please describe the process in a bit more detail (200 characters minimum).";
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Analysing...";
+  status.textContent = "This takes around 20 seconds.";
+  results.style.display = "none";
+
+  try {
+    const res = await fetch(WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({ description, source: "mirmahadiabbas.com" })
     });
-  }
-  function num(el, fallback) {
-    var v = parseFloat(el.value);
-    return isFinite(v) && v >= 0 ? v : fallback;
-  }
+    const raw = await res.text();
+    const clean = raw.replace(/```json/g, "").replace(/```/g, "").trim();
+    const d = JSON.parse(clean);
 
-  /* ----- static calculation ----- */
-  function recalc() {
-    var p = num(people, 0), r = num(rate, 0), m = num(mins, 0);
-    var perMinute = p * r / 60;
-    totalEl.textContent = gbp(perMinute * m, perMinute * m >= 100 ? 0 : 2);
-    perMinEl.textContent = gbp(perMinute, 2);
-  }
-  [people, rate, mins].forEach(function (el) {
-    el.addEventListener('input', recalc);
-  });
-  recalc();
+    $("pm_name").textContent = d.process_name || "Process";
+    $("pm_summary").textContent = d.summary || "";
 
-  /* ----- live ticker ----- */
-  var timer = null, lastTick = 0, spent = 0, startedAt = 0;
-
-  function tick() {
-    var now = Date.now();
-    // accrue at the CURRENT room rate, so mid-meeting changes count properly
-    spent += (now - lastTick) / 1000 * (num(people, 0) * num(rate, 0) / 3600);
-    lastTick = now;
-
-    var sec = Math.floor((now - startedAt) / 1000);
-    var mm = String(Math.floor(sec / 60)).padStart(2, '0');
-    var ss = String(sec % 60).padStart(2, '0');
-    elapsedEl.textContent = mm + ':' + ss;
-    runningEl.textContent = gbp(spent, 2);
-  }
-
-  liveBtn.addEventListener('click', function () {
-    if (timer) {
-      clearInterval(timer); timer = null;
-      liveBtn.textContent = 'Start live ticker';
-      liveBtn.classList.remove('bbtn--stop');
-      liveBtn.classList.add('bbtn--brass');
-      $('runWrap').classList.remove('on');
-    } else {
-      spent = 0;
-      startedAt = lastTick = Date.now();
-      elapsedEl.textContent = '00:00';
-      runningEl.textContent = gbp(0, 2);
-      timer = setInterval(tick, 250);
-      liveBtn.textContent = 'Stop';
-      liveBtn.classList.remove('bbtn--brass');
-      liveBtn.classList.add('bbtn--stop');
-      $('runWrap').classList.add('on');
+    currentMermaid = d.mermaid_code || "";
+    const target = $("pm_diagram");
+    try {
+      const { svg } = await mermaid.render("pm_svg_" + Date.now(), currentMermaid);
+      target.innerHTML = svg;
+    } catch (err) {
+      target.innerHTML = `<p style="color:#a33;margin:0;">The diagram could not be drawn,
+        but the analysis below is complete. Diagram code:</p>
+        <pre style="white-space:pre-wrap;font-size:0.8rem;">${esc(currentMermaid)}</pre>`;
     }
-  });
 
-  document.getElementById('year').textContent = new Date().getFullYear();
-})();
+    sections.innerHTML = [
+      block("Actors", d.actors),
+      block("Systems", d.systems),
+      block("Steps", d.steps),
+      block("Decision points", d.decisions),
+      block("Possible waste", d.waste_candidates),
+      block("Possible bottlenecks", d.bottlenecks),
+      block("Quick wins to consider", d.quick_wins),
+      block("Questions for the process owner", d.questions_for_owner)
+    ].join("");
+
+    results.style.display = "block";
+    status.textContent = "";
+    results.scrollIntoView({ behavior: "smooth", block: "start" });
+  } catch (err) {
+    status.textContent = "That took too long or something went wrong. Try a shorter description.";
+  } finally {
+    button.disabled = false;
+    button.textContent = "Analyse process";
+  }
+});
 </script>
 </body>
 </html>
