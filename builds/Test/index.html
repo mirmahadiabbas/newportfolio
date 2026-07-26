@@ -157,7 +157,7 @@
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 mermaid.initialize({ startOnLoad: false, theme: 'default' });
 
-const WEBHOOK_URL = "PASTE_YOUR_PROCESS_MAP_WEBHOOK_URL_HERE";
+const WEBHOOK_URL = "https://hook.eu1.make.com/5ym1rjifltamusnxey14uobjke8dxdpv";
 
 const SAMPLE = `When a supplier invoice arrives by email, the finance assistant downloads it and checks whether it quotes a purchase order number. If there is no PO number, the assistant emails the supplier to request one and waits for the reply. If there is a PO, the assistant opens the ERP and checks the invoice against the purchase order. If the amounts match, the assistant enters the invoice into the ERP and sends it to the finance manager for approval. The manager reviews pending approvals twice a week. If the amounts differ, the assistant emails the procurement team to investigate, and procurement usually reply within three working days. Approved invoices are scheduled for the next payment run, which happens on the last Friday of each month. After scheduling, the assistant saves the invoice PDF to a shared drive folder and also updates a tracking spreadsheet manually.`;
 
