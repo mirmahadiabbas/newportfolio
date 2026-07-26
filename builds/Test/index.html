@@ -200,6 +200,7 @@ button.addEventListener("click", async () => {
       body: JSON.stringify({ description, source: "mirmahadiabbas.com" })
     });
     const raw = await res.text();
+    console.log("RAW RESPONSE:", raw);
     const clean = raw.replace(/```json/g, "").replace(/```/g, "").trim();
     const d = JSON.parse(clean);
 
@@ -232,6 +233,7 @@ button.addEventListener("click", async () => {
     status.textContent = "";
     results.scrollIntoView({ behavior: "smooth", block: "start" });
   } catch (err) {
+    console.error("PM ERROR:", err);
     status.textContent = "That took too long or something went wrong. Try a shorter description.";
   } finally {
     button.disabled = false;
