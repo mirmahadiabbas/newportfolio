@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test bench · Mir Mahadi Abbas</title>
+
+<!-- unlisted: not linked from anywhere, kept out of search results -->
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- shared Builds theme: everything on the builds pages is available here -->
+<link rel="stylesheet" href="../builds.css">
+
+<style>
+  /* ===== put styles for whatever you are testing in here ===== */
+
+  .tb-flag {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--brass-hi);
+    border: 1px dashed rgba(194, 147, 47, 0.6);
+    border-radius: 999px; padding: 5px 13px;
+  }
+  .tb-scratch {
+    border: 1px dashed rgba(194, 147, 47, 0.55);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    margin-top: 8px;
+  }
+  .tb-scratch > .tb-empty {
+    font-family: var(--font-mono); font-size: 12px;
+    color: var(--mute); text-align: center; padding: 26px 0;
+  }
+  .tb-ref { margin-top: 26px; }
+  .tb-ref summary { cursor: pointer; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
+  .tb-ref summary:hover { color: var(--brass-deep); }
+  .tb-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin: 14px 0 22px; }
+  .tb-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .tb-code {
+    font-family: var(--font-mono); font-size: 11.5px; line-height: 1.7;
+    background: var(--ivory-2); border: 1px solid var(--line-light);
+    border-radius: var(--radius-sm); padding: 12px 14px;
+    white-space: pre-wrap; color: var(--ink-soft); overflow-x: auto;
+  }
+  .tb-label { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mute); margin: 20px 0 8px; }
+  @media (max-width: 620px) { .tb-grid2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="bwrap">
+  <div class="btop">
+    <a class="btop-name" href="../../">Mir Mahadi <em>Abbas</em></a>
+    <a class="bback" href="../">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+      All builds
+    </a>
+  </div>
+
+  <main class="bpage">
+    <div class="bsheet">
+      <p class="beyebrow">Private · unlisted</p>
+      <h1>Test <em>bench</em></h1>
+      <p class="blead">Scratch space for trying things out. Nothing links here and it is kept out of search results, but the address is still public: anyone with the URL, or reading the GitHub repo, can see whatever is on this page. Keep private material off it.</p>
+      <p class="tb-flag">Not linked from the site</p>
+
+      <!-- ==========================================================
+           SCRATCH AREA
+           Paste whatever you are testing between these markers.
+           Delete the placeholder line below when you do.
+           Styles go in the <style> block at the top of this file,
+           scripts go in the <script> block at the bottom.
+           ========================================================== -->
+      <div class="tb-scratch" id="scratch">
+        <p class="tb-empty">Paste what you are testing here</p>
+      </div>
+      <!-- ====================== END SCRATCH ====================== -->
+
+      <details class="tb-ref">
+        <summary>Theme components you can paste in</summary>
+
+        <p class="tb-label">Buttons</p>
+        <div class="tb-row">
+          <button class="bbtn bbtn--brass" type="button">Primary action</button>
+          <button class="bbtn bbtn--ghost" type="button">Secondary</button>
+        </div>
+        <p class="tb-code">&lt;button class="bbtn bbtn--brass"&gt;Primary action&lt;/button&gt;
+&lt;button class="bbtn bbtn--ghost"&gt;Secondary&lt;/button&gt;</p>
+
+        <p class="tb-label">Form field</p>
+        <div class="bfield">
+          <label for="tb_demo">Field label</label>
+          <input type="text" id="tb_demo" placeholder="Type something">
+          <p class="bhint">Small hint text sits under the field.</p>
+        </div>
+        <p class="tb-code">&lt;div class="bfield"&gt;
+  &lt;label for="x"&gt;Field label&lt;/label&gt;
+  &lt;input type="text" id="x"&gt;
+  &lt;p class="bhint"&gt;Hint text&lt;/p&gt;
+&lt;/div&gt;</p>
+
+        <p class="tb-label">Result panels</p>
+        <div class="tb-grid2">
+          <div class="bresult"><div class="bnum">£270</div><div class="blabel">Big number</div></div>
+          <div class="bresult"><div class="bnum">12</div><div class="blabel">Second metric</div></div>
+        </div>
+        <p class="tb-code">&lt;div class="bresult"&gt;
+  &lt;div class="bnum"&gt;£270&lt;/div&gt;
+  &lt;div class="blabel"&gt;Big number&lt;/div&gt;
+&lt;/div&gt;</p>
+
+        <p class="tb-label">Note with a brass rule</p>
+        <p class="bnote">Use this for caveats, privacy lines, and anything that needs to be said plainly.</p>
+        <p class="tb-code">&lt;p class="bnote"&gt;Caveat text&lt;/p&gt;</p>
+
+        <p class="tb-label">Section heading inside a sheet</p>
+        <p class="tb-code">&lt;p class="beyebrow"&gt;Eyebrow&lt;/p&gt;
+&lt;h1&gt;Title with an &lt;em&gt;accent&lt;/em&gt; word&lt;/h1&gt;
+&lt;p class="blead"&gt;Lead paragraph&lt;/p&gt;</p>
+
+        <p class="tb-label">Useful CSS variables</p>
+        <p class="tb-code">--pine-950 #0B1912   dark background
+--ivory   #F4F0E4   sheet background
+--ink     #17281D   body text on ivory
+--mute    #5A675C   quiet text
+--brass   #C2932F   accent
+--leaf    #79B36A   success or live
+--font-display / --font-body / --font-mono
+--radius / --radius-sm / --radius-lg / --ease</p>
+      </details>
+    </div>
+  </main>
+
+  <footer class="bfoot">
+    <span>&copy; <span id="year"></span> Mir Mahadi Abbas</span>
+    <a href="../../">mirmahadiabbas.com</a>
+  </footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  /* ===== scripts for whatever you are testing go in here ===== */
+
+})();
+</script>
+</body>
+</html>

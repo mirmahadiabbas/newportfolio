@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Meeting Minutes · Builds · Mir Mahadi Abbas</title>
+<meta name="description" content="Paste a meeting transcript, get back clean minutes: summary, decisions, actions with owners, and open questions, as a PDF in your inbox. Live and free to try.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="AI Meeting Minutes · Mir Mahadi Abbas">
+<meta property="og:description" content="Paste a transcript, get professional minutes by email: summary, decisions, actions with owners, and open questions, as a PDF.">
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- shared Builds theme -->
+<link rel="stylesheet" href="../builds.css">
+
+<!-- styles specific to this page -->
+<style>
+  .m-status {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: #3F7A33;
+    background: rgba(121, 179, 106, 0.14);
+    border: 1px solid rgba(79, 138, 65, 0.45);
+    border-radius: 999px; padding: 4px 11px;
+    margin-left: 10px; vertical-align: middle;
+  }
+  .m-status .dot { width: 6px; height: 6px; border-radius: 50%; background: #4F8A41; animation: bpulse 2.2s ease-out infinite; }
+  .m-cta { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin: 26px 0 8px; }
+
+  .m-h2 { font-family: var(--font-display); font-size: clamp(24px, 3.2vw, 30px); margin: 38px 0 14px; }
+
+  /* journey steps */
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .step { background: #FBF9F1; border: 1px solid var(--line-light); border-radius: var(--radius-sm); padding: 15px 16px; }
+  .step b { font-family: var(--font-display); font-size: 26px; color: var(--brass-deep); display: block; line-height: 1; margin-bottom: 9px; }
+  .step span { font-size: 13px; line-height: 1.55; color: var(--ink-soft); display: block; }
+
+  /* inbox panels */
+  .inbox { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .inbox-panel { background: var(--pine-950); color: var(--cream); border-radius: var(--radius); padding: 22px 24px; }
+  .inbox-panel b { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass-hi); display: block; margin-bottom: 11px; }
+  .inbox-panel p { font-size: 13.5px; line-height: 1.65; color: var(--cream-70); }
+  .inbox-panel ul { list-style: none; margin-top: 4px; }
+  .inbox-panel li { font-size: 13.5px; line-height: 1.9; color: var(--cream-70); padding-left: 16px; position: relative; }
+  .inbox-panel li::before { content: ""; position: absolute; left: 0; top: 0.78em; width: 6px; height: 6px; border-radius: 2px; background: var(--brass); }
+
+  /* pipeline */
+  .pl { display: flex; align-items: stretch; gap: 8px; flex-wrap: wrap; }
+  .pl-node { flex: 1 1 120px; background: var(--ivory-2); border: 1px solid var(--line-light); border-radius: var(--radius-sm); padding: 12px 13px; }
+  .pl-node b { display: block; font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--brass-deep); margin-bottom: 5px; }
+  .pl-node span { font-size: 12.5px; line-height: 1.5; color: var(--ink); display: block; }
+  .pl-arr { align-self: center; color: var(--mute); flex: none; }
+  .pl-arr svg { width: 14px; height: 14px; display: block; }
+
+  /* Make screenshot */
+  .m-shot { margin-top: 22px; border: 1px solid var(--line-light); border-radius: var(--radius-sm); background: #F0F0F0; padding: 16px 14px 12px; }
+  .m-shot img { width: 100%; height: auto; display: block; }
+  .m-shot figcaption { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.07em; color: var(--mute); text-align: center; margin-top: 11px; }
+
+  /* extraction rules */
+  .rules { list-style: none; max-width: 660px; }
+  .rules li { display: flex; gap: 12px; align-items: flex-start; padding: 9px 0; border-bottom: 1px solid var(--line-light); font-size: 14px; line-height: 1.6; color: var(--ink-soft); }
+  .rules li:last-child { border-bottom: 0; }
+  .rules svg { width: 16px; height: 16px; flex: none; margin-top: 4px; color: var(--leaf); }
+
+  /* limits */
+  .limits { display: flex; flex-wrap: wrap; gap: 8px; }
+  .limits span { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.04em; color: var(--mute); border: 1px solid var(--line-light); border-radius: 999px; padding: 5px 13px; }
+
+  .m-buildnote { margin-top: 30px; font-size: 13.5px; line-height: 1.65; color: var(--mute); max-width: 660px; }
+
+  /* ===== try it: sample data ===== */
+  #try { scroll-margin-top: 24px; }
+  .try-intro { font-size: 15px; line-height: 1.65; color: var(--ink-soft); max-width: 640px; }
+  .sample { background: var(--ivory-2); border: 1px solid var(--line-light); border-radius: var(--radius); padding: 20px 20px 16px; margin: 24px 0 30px; }
+  .sample-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 6px; }
+  .sample-head b { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass-deep); }
+  .sample-head p { font-size: 13px; color: var(--ink-soft); flex: 1 1 100%; margin-top: 2px; }
+  .scards { display: grid; gap: 10px; margin-top: 12px; }
+  .scard { background: #FBF9F1; border: 1px solid var(--line-light); border-radius: var(--radius-sm); overflow: hidden; }
+  .scard-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 13px; border-bottom: 1px solid var(--line-light); }
+  .scard-head span { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mute); }
+  .copy-btn {
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    border: 1px solid var(--line-light); border-radius: 6px;
+    padding: 4px 11px; color: var(--ink-soft);
+    transition: border-color .2s, color .2s;
+  }
+  .copy-btn:hover { border-color: var(--brass-deep); color: var(--brass-deep); }
+  .copy-btn.did { border-color: #4F8A41; color: #3F7A33; }
+  .scard pre {
+    font-family: var(--font-mono); font-size: 11.5px; line-height: 1.7;
+    color: var(--ink-soft); padding: 11px 14px; margin: 0;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .scard pre.tall { max-height: 190px; overflow: auto; }
+
+  /* ===== try it: form ===== */
+  .mform { display: grid; gap: 16px; max-width: 680px; }
+  .mform-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .mform textarea { resize: vertical; font-family: var(--font-body); font-size: 14px; }
+  #mf_transcript { font-family: var(--font-mono); font-size: 12.5px; line-height: 1.6; }
+  .mf-count { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.05em; color: var(--mute); text-align: right; margin-top: 5px; }
+  .mf-consent { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; line-height: 1.55; color: var(--ink-soft); max-width: 640px; }
+  .mf-consent input { width: 15px; height: 15px; margin-top: 2.5px; accent-color: var(--brass-deep); flex: none; }
+  .mf-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .mf-status { font-size: 13.5px; line-height: 1.5; min-height: 1.4em; font-weight: 500; }
+  .mf-status.good { color: #3F7A33; }
+  .mf-status.bad { color: #A03B2E; }
+
+  @media (max-width: 820px) { .steps { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 620px) {
+    .steps, .inbox, .mform-row { grid-template-columns: 1fr; }
+    .pl { flex-direction: column; }
+    .pl-arr svg { transform: rotate(90deg); margin: 0 auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bwrap">
+  <div class="btop">
+    <a class="btop-name" href="../../">Mir Mahadi <em>Abbas</em></a>
+    <a class="bback" href="../">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+      All builds
+    </a>
+  </div>
+
+  <main class="bpage">
+    <div class="bsheet">
+      <p class="beyebrow">Build 002 · AI-connected</p>
+      <h1>AI Meeting <em>Minutes</em><span class="m-status"><span class="dot" aria-hidden="true"></span>Live</span></h1>
+      <p class="blead">Paste a transcript, get back clean minutes: summary, decisions, actions with owners, and open questions, as a PDF in your inbox. Free to use.</p>
+
+      <div class="m-cta">
+        <a class="bbtn bbtn--brass" href="#try">Try it</a>
+      </div>
+      <p class="bhint">Free, no sign-up. The form is at the bottom of this page, with sample data if you have no transcript to hand.</p>
+
+      <h2 class="m-h2">How it works for you</h2>
+      <div class="steps">
+        <div class="step"><b>1</b><span>Fill a short form: name, email, meeting title, date, attendees if you have them, and the transcript pasted as text. Up to roughly 45,000 characters, about an hour of meeting.</span></div>
+        <div class="step"><b>2</b><span>The service reads the transcript and builds structured minutes from what was actually said.</span></div>
+        <div class="step"><b>3</b><span>An email lands in your inbox, usually within a few minutes.</span></div>
+        <div class="step"><b>4</b><span>The email body holds a short narrative summary and the action list; the full minutes come attached as a PDF.</span></div>
+      </div>
+
+      <h2 class="m-h2">What lands in your inbox</h2>
+      <div class="inbox">
+        <div class="inbox-panel">
+          <b>Email body</b>
+          <p>A 100 to 160 word narrative summary of the meeting, followed by the action list so owners can see their tasks without opening anything.</p>
+        </div>
+        <div class="inbox-panel">
+          <b>Attached PDF, five sections</b>
+          <ul>
+            <li>Overview</li>
+            <li>Key discussion points, grouped by topic</li>
+            <li>Decisions</li>
+            <li>Actions: owner, task, deadline, priority</li>
+            <li>Open questions</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 class="m-h2">The pipeline behind it</h2>
+      <div class="pl">
+        <div class="pl-node"><b>Webhook</b><span>This page's form posts straight to the scenario</span></div>
+        <div class="pl-arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <div class="pl-node"><b>Make.com</b><span>Six-module scenario orchestrates the flow</span></div>
+        <div class="pl-arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <div class="pl-node"><b>Claude API</b><span>Structured prompt returns strict JSON: summary, decisions, actions, questions</span></div>
+        <div class="pl-arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <div class="pl-node"><b>Google Docs</b><span>Branded minutes template auto-fills from the JSON</span></div>
+        <div class="pl-arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <div class="pl-node"><b>PDF</b><span>Document exports as a PDF</span></div>
+        <div class="pl-arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <div class="pl-node"><b>Gmail</b><span>Summary email sends with the PDF attached</span></div>
+      </div>
+
+      <figure class="m-shot">
+        <img src="make-scenario.png" alt="The live Make scenario: a webhook module feeding JSON parsing, then Anthropic Claude, then Google Docs template fill and document download, ending with Gmail delivery." width="1440" height="225" loading="lazy">
+        <figcaption>The live scenario in Make: webhook to inbox in six modules.</figcaption>
+      </figure>
+
+      <h2 class="m-h2">Built not to bluff</h2>
+      <ul class="rules">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Extracts only what is in the transcript; never invents names, deadlines, decisions, or numbers.</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Distinguishes decisions that were explicitly agreed from suggestions that were merely raised.</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Actions get an owner only when the transcript makes ownership clear; otherwise they are marked Unassigned.</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Missing deadlines are marked "Not specified" rather than guessed.</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Non-transcript or too-thin input fails gracefully: the reply explains the problem instead of fabricating minutes.</li>
+      </ul>
+
+      <h2 class="m-h2">Honest limits</h2>
+      <div class="limits">
+        <span>Paste-only text transcripts for now</span>
+        <span>English output, British English style</span>
+        <span>Free to use, capped monthly volume</span>
+      </div>
+
+      <!-- ===================== TRY IT ===================== -->
+      <h2 class="m-h2" id="try">Try it now</h2>
+      <p class="try-intro">Add your details, paste a transcript, and the minutes arrive by email. Your email address is used only to deliver these minutes: no mailing list, no follow-ups, nothing else.</p>
+
+      <div class="sample">
+        <div class="sample-head">
+          <b>No transcript to hand?</b>
+          <button class="bbtn bbtn--ghost" id="fillSample" type="button">Fill the form with this sample</button>
+          <p>Use this fictional weekly delivery sync: one click fills the form below, or copy any piece into the matching field. Just add your name and email.</p>
+        </div>
+        <div class="scards">
+          <div class="scard">
+            <div class="scard-head"><span>Meeting title</span><button class="copy-btn" type="button" data-copy="title">Copy</button></div>
+            <pre id="sampleTitle"></pre>
+          </div>
+          <div class="scard">
+            <div class="scard-head"><span>Attendees</span><button class="copy-btn" type="button" data-copy="attendees">Copy</button></div>
+            <pre id="sampleAttendees"></pre>
+          </div>
+          <div class="scard">
+            <div class="scard-head"><span>Transcript</span><button class="copy-btn" type="button" data-copy="transcript">Copy</button></div>
+            <pre id="sampleTranscript" class="tall"></pre>
+          </div>
+        </div>
+      </div>
+
+      <form class="mform" id="minutesForm" novalidate>
+        <div class="mform-row">
+          <div class="bfield">
+            <label for="mf_name">Your name</label>
+            <input type="text" id="mf_name" required maxlength="100" autocomplete="name">
+          </div>
+          <div class="bfield">
+            <label for="mf_email">Your email</label>
+            <input type="email" id="mf_email" required maxlength="150" autocomplete="email">
+            <p class="bhint">Only used to send you these minutes.</p>
+          </div>
+        </div>
+        <div class="mform-row">
+          <div class="bfield">
+            <label for="mf_title">Meeting title</label>
+            <input type="text" id="mf_title" required maxlength="150">
+          </div>
+          <div class="bfield">
+            <label for="mf_date">Meeting date</label>
+            <input type="date" id="mf_date" required>
+          </div>
+        </div>
+        <div class="bfield">
+          <label for="mf_attendees">Attendees, one per line (optional, improves action assignment)</label>
+          <textarea id="mf_attendees" rows="4" maxlength="1000" placeholder="Sarah Chen - Finance Lead"></textarea>
+        </div>
+        <div class="bfield">
+          <label for="mf_transcript">Meeting transcript</label>
+          <textarea id="mf_transcript" rows="11" maxlength="45000" required placeholder="Paste the transcript text here"></textarea>
+          <p class="mf-count"><span id="mf_count">0</span> / 45,000 characters</p>
+        </div>
+
+        <!-- honeypot: humans never see it, bots fill it -->
+        <input type="text" id="mf_website" name="website" autocomplete="off" tabindex="-1"
+          style="position:absolute;left:-9999px" aria-hidden="true">
+
+        <label class="mf-consent">
+          <input type="checkbox" id="mf_consent" required>
+          <span>I have permission to share this transcript. It will be processed via the Anthropic Claude API to generate my minutes; API data is not used to train AI models.</span>
+        </label>
+
+        <div class="mf-actions">
+          <button type="submit" class="bbtn bbtn--brass" id="mf_button">Generate minutes</button>
+          <p class="mf-status" id="mf_status" role="status" aria-live="polite"></p>
+        </div>
+        <noscript><p class="bhint">This form needs JavaScript to send.</p></noscript>
+      </form>
+
+      <p class="bnote">Transcripts are processed via the Anthropic Claude API to generate your minutes. API data is not used to train AI models. Please only submit transcripts you have permission to share.</p>
+
+      <p class="m-buildnote">Designed and built end to end by Mir in a single session: form intake, structured LLM extraction to strict JSON, templated document generation, PDF export, and automated email delivery. Stack: Make.com, Anthropic Claude API (Sonnet), Google Docs, Google Drive, Gmail. The form above posts directly to the live scenario's webhook.</p>
+    </div>
+  </main>
+
+  <footer class="bfoot">
+    <span>&copy; <span id="year"></span> Mir Mahadi Abbas</span>
+    <a href="../../">mirmahadiabbas.com</a>
+  </footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  /* ---------- sample data (single source for the cards and the fill button) ---------- */
+  var SAMPLE = {
+    title: 'AI Customer Assistant Pilot - Weekly Delivery Sync',
+    attendees: [
+      'Rachel Adeyemi - Programme Director',
+      'Michael Torres - Project Manager',
+      'Anika Sharma - Data and AI Lead',
+      'Ben Kowalski - Customer Operations Manager',
+      'Laura Finch - Finance Business Partner'
+    ].join('\n'),
+    transcript: [
+      "Michael: Right, let's make a start. Main item is the AI assistant pilot in Customer Operations. Anika, where are we?",
+      "",
+      "Anika: The model is integrated with the knowledge base and we have finished testing against the historic ticket set. Accuracy on first-response drafting is sitting at 88 per cent, which is above the 85 we set as the pilot threshold. The blocker is the DPIA. Legal have had it for two weeks and we cannot put real customer data through until it is signed.",
+      "",
+      "Michael: What is the hold-up?",
+      "",
+      "Anika: They have come back with questions on data retention with the vendor. I have drafted the answers but I have not sent them over yet.",
+      "",
+      "Michael: Anika, get that back to Legal today please. That is the critical path now.",
+      "",
+      "Anika: Understood.",
+      "",
+      "Rachel: Does this put go-live at risk? We committed to the board for the end of next month.",
+      "",
+      "Michael: If Legal sign off this week we are fine. Four weeks of pilot, two weeks to evaluate, go-live on the 30th. If the DPIA slips past Friday, the pilot start slips with it.",
+      "",
+      "Rachel: I do not want to lose that date. Is there a way to start without real data?",
+      "",
+      "Anika: We could start on the anonymised test set. It is a weaker signal, agents would be reviewing drafts on historic tickets rather than live ones, but it would let us shake out the workflow.",
+      "",
+      "Rachel: Then let's do that. If the DPIA is not signed by Friday, we start the pilot on anonymised data on Monday regardless, and swap to live data once it is cleared.",
+      "",
+      "Michael: Agreed, that is the fallback. Ben, how is the team side looking?",
+      "",
+      "Ben: Day shift have had the walkthrough. The evening team have not, and I have three people on leave next week, so I will need to run a second session.",
+      "",
+      "Michael: Can you put together the list of who still needs it?",
+      "",
+      "Ben: Yes, I will get that over to you.",
+      "",
+      "Laura: Question on cost. The extra seat licences for the evening team, is that coming from project contingency or does it need a new request?",
+      "",
+      "Michael: Contingency, I would assume. Laura, can you confirm we have the headroom?",
+      "",
+      "Laura: I will check the numbers and come back. I think we are fine but I want to see it properly.",
+      "",
+      "Ben: One thing while we are here. Could we not just use the smaller model? It is cheaper per query and for straightforward enquiries it would probably be fine.",
+      "",
+      "Anika: Possibly, but I would want to test that properly before we commit. The accuracy gap on complex tickets was significant last time we looked.",
+      "",
+      "Michael: Let's keep it on the list but not for this phase. We can look at it as an optimisation after go-live.",
+      "",
+      "Rachel: Last thing from me. Are we keeping the human review step permanently, or dropping it once the agents trust the drafts?",
+      "",
+      "Michael: We have not decided. It changes the benefits case quite a bit, so I do not want to answer that off the cuff. Let's pick it up next week alongside Anika's accuracy data from the first fortnight.",
+      "",
+      "Anika: That is sensible. I would want the real numbers before we take the human out of the loop.",
+      "",
+      "Michael: Parked then. Someone also needs to check what the vendor contract says about data retention after the pilot ends, before we go anywhere near go-live.",
+      "",
+      "Rachel: Right, that is us. Same time next week."
+    ].join('\n')
+  };
+
+  document.getElementById('sampleTitle').textContent = SAMPLE.title;
+  document.getElementById('sampleAttendees').textContent = SAMPLE.attendees;
+  document.getElementById('sampleTranscript').textContent = SAMPLE.transcript;
+
+  /* ---------- copy buttons ---------- */
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) { /* nothing else to try */ }
+    document.body.removeChild(ta);
+  }
+  function copyText(text, btn) {
+    var done = function () {
+      btn.textContent = 'Copied';
+      btn.classList.add('did');
+      setTimeout(function () { btn.textContent = 'Copy'; btn.classList.remove('did'); }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text); done(); });
+    } else {
+      fallbackCopy(text);
+      done();
+    }
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.copy-btn'), function (btn) {
+    btn.addEventListener('click', function () {
+      copyText(SAMPLE[btn.getAttribute('data-copy')] || '', btn);
+    });
+  });
+
+  /* ---------- fill the form with the sample ---------- */
+  var status = document.getElementById('mf_status');
+  var countEl = document.getElementById('mf_count');
+  var transcriptEl = document.getElementById('mf_transcript');
+
+  function setCount() {
+    countEl.textContent = transcriptEl.value.length.toLocaleString('en-GB');
+  }
+  transcriptEl.addEventListener('input', setCount);
+
+  document.getElementById('fillSample').addEventListener('click', function () {
+    document.getElementById('mf_title').value = SAMPLE.title;
+    document.getElementById('mf_attendees').value = SAMPLE.attendees;
+    transcriptEl.value = SAMPLE.transcript;
+    document.getElementById('mf_date').value = new Date().toISOString().slice(0, 10);
+    setCount();
+    status.className = 'mf-status';
+    status.textContent = 'Sample loaded. Add your name and email, then generate.';
+    document.getElementById('mf_name').focus();
+    var nameEl = document.getElementById('mf_name');
+    if (nameEl.scrollIntoView) nameEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+
+  /* ---------- submit to the live webhook ---------- */
+  var WEBHOOK_URL = 'https://hook.eu1.make.com/kul17wrxry5qhetdd28ktgt4pf5mbfy4';
+  var form = document.getElementById('minutesForm');
+  var button = document.getElementById('mf_button');
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    // honeypot check: silently drop bots
+    if (document.getElementById('mf_website').value) return;
+
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    var transcript = transcriptEl.value.trim();
+    if (transcript.length < 500) {
+      status.className = 'mf-status bad';
+      status.textContent = 'That transcript looks too short to summarise (minimum around 500 characters).';
+      return;
+    }
+
+    var payload = {
+      name: document.getElementById('mf_name').value.trim(),
+      email: document.getElementById('mf_email').value.trim(),
+      meeting_title: document.getElementById('mf_title').value.trim(),
+      meeting_date: document.getElementById('mf_date').value,
+      attendees: document.getElementById('mf_attendees').value.trim(),
+      transcript: transcript,
+      source: 'mirmahadiabbas.com'
+    };
+
+    button.disabled = true;
+    button.textContent = 'Sending...';
+    status.className = 'mf-status';
+    status.textContent = '';
+
+    fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    })
+      .then(function (res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        form.reset();
+        setCount();
+        status.className = 'mf-status good';
+        status.textContent = 'Done. Your minutes are being generated: check your inbox in the next few minutes, and the spam folder the first time.';
+      })
+      .catch(function () {
+        status.className = 'mf-status bad';
+        status.textContent = 'Something went wrong sending your transcript. Please try again in a minute.';
+      })
+      .finally(function () {
+        button.disabled = false;
+        button.textContent = 'Generate minutes';
+      });
+  });
+})();
+</script>
+</body>
+</html>

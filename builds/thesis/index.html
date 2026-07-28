@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leading Digital Transformation · MSc Thesis · Mir Mahadi Abbas</title>
+<meta name="description" content="Cranfield MSc thesis by Mir Mahadi Abbas: how adaptive project management practices, digital tools and leadership adaptability combine into delivery excellence. An internship-based study inside TUI Airlines.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Leading Digital Transformation through Project Management">
+<meta property="og:description" content="Adaptive project management practices, tools, and strategic recommendations for delivery excellence. MSc thesis, Cranfield School of Management.">
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- shared Builds theme -->
+<link rel="stylesheet" href="../builds.css">
+
+<!-- styles specific to this page -->
+<style>
+  /* hero */
+  .t-hero { padding: clamp(44px, 7vw, 76px) 0 10px; max-width: 760px; }
+  .t-hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(38px, 6vw, 62px);
+    line-height: 1.06;
+    margin-bottom: 18px;
+  }
+  .t-hero h1 em { color: var(--brass-hi); font-style: italic; }
+  .t-sub { color: var(--cream-70); font-size: 16.5px; max-width: 640px; }
+  .t-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+  .t-meta span {
+    font-family: var(--font-mono); font-size: 10.5px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--cream-70);
+    border: 1px solid var(--line-dark);
+    border-radius: 999px; padding: 5px 12px;
+  }
+
+  /* stats strip */
+  .tstats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    border: 1px solid var(--line-dark); border-radius: var(--radius);
+    background: var(--pine-900);
+    margin: 34px 0 8px;
+    animation: bfade .6s var(--ease) both;
+  }
+  .tstat { padding: 22px 20px; }
+  .tstat + .tstat { border-left: 1px solid var(--line-dark); }
+  .tnum { font-family: var(--font-display); font-size: clamp(32px, 4vw, 44px); color: var(--brass-hi); line-height: 1; }
+  .tlab { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cream-45); margin-top: 9px; line-height: 1.5; }
+
+  /* generic blocks */
+  .t-block { padding: 26px 0 6px; animation: bfade .6s var(--ease) both; }
+  .t-kicker-note { color: var(--cream-70); font-size: 15.5px; max-width: 640px; margin-top: -6px; margin-bottom: 26px; }
+  .bsheet h2, .t-block h2 { font-family: var(--font-display); font-size: clamp(27px, 3.6vw, 36px); margin-bottom: 14px; }
+  .t-block h2 { color: var(--cream); }
+  .bsheet p.body, .t-body { font-size: 15px; line-height: 1.7; color: var(--ink-soft); max-width: 680px; }
+  .cap { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.07em; color: var(--mute); text-align: center; margin-top: 16px; }
+  .t-block .cap { color: var(--cream-45); }
+
+  /* research flow */
+  .flow { display: flex; align-items: stretch; gap: 8px; margin-top: 26px; flex-wrap: wrap; }
+  .flow-step {
+    flex: 1 1 140px;
+    background: #FBF9F1; border: 1px solid var(--line-light); border-radius: var(--radius-sm);
+    padding: 14px 14px 12px;
+  }
+  .flow-step b { display: block; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; color: var(--brass-deep); margin-bottom: 7px; }
+  .flow-step span { font-size: 13px; line-height: 1.5; color: var(--ink); display: block; }
+  .flow-arr { align-self: center; color: var(--mute); flex: none; }
+  .flow-arr svg { width: 15px; height: 15px; display: block; }
+
+  /* findings */
+  .find-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
+  .find {
+    background: var(--pine-900); border: 1px solid var(--line-dark);
+    border-radius: var(--radius); padding: 24px 24px 20px;
+  }
+  .find b { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass); display: block; margin-bottom: 10px; }
+  .find h3 { font-family: var(--font-display); font-size: 23px; line-height: 1.2; margin-bottom: 10px; }
+  .find p { font-size: 14px; line-height: 1.65; color: var(--cream-70); }
+  .find blockquote { margin-top: 16px; border-left: 2px solid var(--brass); padding-left: 14px; }
+  .find blockquote p { font-family: var(--font-display); font-style: italic; font-size: 17.5px; line-height: 1.4; color: var(--cream); }
+  .find cite { display: block; font-family: var(--font-mono); font-style: normal; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--cream-45); margin-top: 8px; }
+
+  /* framework diagram */
+  .fx { margin-top: 30px; }
+  .fx-top {
+    background: var(--pine-950); color: var(--cream);
+    border-top: 3px solid var(--brass);
+    border-radius: var(--radius-sm);
+    padding: 20px 24px;
+  }
+  .fx-top h3 { font-family: var(--font-display); font-size: 26px; margin-bottom: 8px; }
+  .fx-top ul { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 22px; }
+  .fx-top li { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.05em; color: var(--cream-70); display: flex; gap: 8px; align-items: baseline; }
+  .fx-top li::before { content: "·"; color: var(--brass-hi); }
+  .fx-arrows { display: grid; grid-template-columns: repeat(3, 1fr); padding: 10px 0; }
+  .fx-arrows svg { width: 16px; height: 20px; margin: 0 auto; display: block; color: var(--brass-deep); }
+  .fx-pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .fx-pillar { background: #FBF9F1; border: 1px solid var(--line-light); border-radius: var(--radius-sm); padding: 16px 18px; }
+  .fx-pillar b { display: block; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); margin-bottom: 9px; }
+  .fx-pillar ul { list-style: none; }
+  .fx-pillar li { font-size: 12.5px; color: var(--ink-soft); line-height: 1.55; padding-left: 12px; position: relative; }
+  .fx-pillar li::before { content: ""; position: absolute; left: 0; top: 0.62em; width: 5px; height: 5px; border-radius: 50%; background: var(--brass); }
+  .fx-mid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center; margin-top: 14px; }
+  .fx-sup { background: var(--ivory-2); border: 1px solid var(--line-light); border-radius: var(--radius-sm); padding: 13px 16px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); text-align: center; }
+  .fx-dbl { color: var(--mute); }
+  .fx-dbl svg { width: 22px; height: 14px; display: block; }
+  .fx-base {
+    margin-top: 14px;
+    background: rgba(194, 147, 47, 0.13);
+    border: 1px solid rgba(151, 112, 31, 0.4);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    text-align: center;
+    font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--brass-deep);
+  }
+
+  /* tools chart */
+  .chart { margin-top: 30px; max-width: 720px; }
+  .crow { display: grid; grid-template-columns: 118px 1fr 26px; gap: 12px; align-items: center; margin-bottom: 11px; }
+  .clab { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.04em; color: var(--cream-70); text-align: right; }
+  .ctrack { height: 15px; background: rgba(242, 238, 223, 0.08); border-radius: 4px; overflow: hidden; }
+  .cfill { height: 100%; width: 0; border-radius: 4px; background: linear-gradient(90deg, var(--brass-deep), var(--brass-hi)); transition: width 1s var(--ease); }
+  .chart.in .cfill { width: var(--w); }
+  .cval { font-family: var(--font-mono); font-size: 11.5px; color: var(--brass-hi); }
+
+  /* recommendations */
+  .rec-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px; }
+  .rec { background: #FBF9F1; border: 1px solid var(--line-light); border-radius: var(--radius); padding: 22px 22px 20px; }
+  .rec b { font-family: var(--font-display); font-size: 34px; color: var(--brass-deep); display: block; line-height: 1; margin-bottom: 12px; }
+  .rec h3 { font-family: var(--font-display); font-size: 21px; line-height: 1.2; margin-bottom: 9px; }
+  .rec p { font-size: 13.5px; line-height: 1.6; color: var(--ink-soft); }
+
+  /* roadmap */
+  .rd { display: flex; align-items: stretch; gap: 10px; margin-top: 26px; }
+  .rd-phase { flex: 1; background: var(--ivory-2); border: 1px solid var(--line-light); border-radius: var(--radius-sm); padding: 16px 18px; }
+  .rd-phase b { display: block; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass-deep); margin-bottom: 7px; }
+  .rd-phase h4 { font-family: var(--font-display); font-size: 19px; line-height: 1.15; margin-bottom: 5px; }
+  .rd-phase span { font-family: var(--font-mono); font-size: 11px; color: var(--mute); }
+  .rd-arr { align-self: center; color: var(--mute); flex: none; }
+  .rd-arr svg { width: 16px; height: 16px; display: block; }
+
+  /* demonstrates + cta */
+  .t-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 30px; }
+  .t-tags span { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.05em; color: var(--cream-45); border: 1px solid var(--line-dark); border-radius: 999px; padding: 4px 12px; }
+  .t-cta { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; padding-bottom: 26px; }
+  .t-cta .note { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.05em; color: var(--cream-45); }
+
+  @media (max-width: 860px) {
+    .tstats { grid-template-columns: 1fr 1fr; }
+    .tstat:nth-child(3) { border-left: 0; }
+    .tstat:nth-child(n+3) { border-top: 1px solid var(--line-dark); }
+    .find-grid, .rec-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 680px) {
+    .fx-pillars { grid-template-columns: 1fr; }
+    .fx-arrows { grid-template-columns: 1fr; }
+    .fx-arrows svg:nth-child(n+2) { display: none; }
+    .fx-mid { grid-template-columns: 1fr; }
+    .fx-dbl svg { transform: rotate(90deg); margin: 0 auto; }
+    .flow { flex-direction: column; }
+    .flow-arr svg { transform: rotate(90deg); margin: 0 auto; }
+    .rd { flex-direction: column; }
+    .rd-arr svg { transform: rotate(90deg); margin: 0 auto; }
+    .crow { grid-template-columns: 86px 1fr 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bwrap">
+  <div class="btop">
+    <a class="btop-name" href="../../">Mir Mahadi <em>Abbas</em></a>
+    <a class="bback" href="../">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+      All builds
+    </a>
+  </div>
+
+  <!-- ============ HERO ============ -->
+  <header class="t-hero">
+    <p class="beyebrow">MSc Thesis · Cranfield School of Management · 2024-25</p>
+    <h1>Leading Digital Transformation through <em>Project Management</em></h1>
+    <p class="t-sub">Adaptive project management practices, tools, and strategic recommendations for delivery excellence. An internship-based case study inside TUI Airlines' Business Development and Transformation division.</p>
+    <div class="t-meta">
+      <span>Supervisor: Dr Enrico Fontana</span>
+      <span>MSc Management, Distinction</span>
+      <span>October 2025</span>
+    </div>
+  </header>
+
+  <!-- ============ STATS ============ -->
+  <div class="tstats">
+    <div class="tstat"><div class="tnum">70%</div><div class="tlab">of digital transformations miss their intended outcomes (McKinsey, 2023)</div></div>
+    <div class="tstat"><div class="tnum">11</div><div class="tlab">senior practitioners interviewed</div></div>
+    <div class="tstat"><div class="tnum">3 mo</div><div class="tlab">embedded inside a live transformation programme</div></div>
+    <div class="tstat"><div class="tnum">1 + 3</div><div class="tlab">strategic framework and three recommendations</div></div>
+  </div>
+
+  <!-- ============ PROBLEM + METHOD ============ -->
+  <main>
+  <div class="bsheet">
+    <p class="beyebrow">The problem</p>
+    <h2>The technology is rarely what fails</h2>
+    <p class="body">Organisations are spending trillions on digital transformation, yet around 70% of these initiatives fail to deliver what they promised. The research showed the failures rarely come from the technology itself. They come from rigid methodologies applied to fluid problems, fragmented tool ecosystems that bury visibility, and leadership that struggles to adapt to organisational and cultural realities. There is a persistent gap between what the theory recommends and what project managers can actually do inside real organisations.</p>
+
+    <p class="beyebrow" style="margin-top:38px">How I researched it</p>
+    <h2>Three months inside the problem</h2>
+    <p class="body">I spent three months embedded as a Project Management Intern in TUI Airlines' Business Development and Transformation team, working across live transformation programmes including the Advanced Crew Ecosystem. Alongside the day job, I conducted eleven semi-structured interviews with project and programme managers delivering change across TUI's European entities, then analysed them using a Gioia-informed thematic method. The study received formal ethics approval through Cranfield's research ethics system, and all participants were anonymised.</p>
+
+    <div class="flow">
+      <div class="flow-step"><b>01</b><span>Embedded internship at TUI Airlines</span></div>
+      <div class="flow-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <div class="flow-step"><b>02</b><span>11 semi-structured interviews</span></div>
+      <div class="flow-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <div class="flow-step"><b>03</b><span>Thematic coding (Gioia method)</span></div>
+      <div class="flow-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <div class="flow-step"><b>04</b><span>Triangulation with literature</span></div>
+      <div class="flow-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <div class="flow-step"><b>05</b><span>Framework and recommendations</span></div>
+    </div>
+    <p class="cap">From field immersion to framework.</p>
+  </div>
+
+  <!-- ============ FINDINGS ============ -->
+  <section class="t-block">
+    <p class="beyebrow">What I found</p>
+    <h2>Four findings from the front line</h2>
+    <div class="find-grid">
+      <div class="find">
+        <b>Finding 01</b>
+        <h3>Methodology is a negotiation, not a template</h3>
+        <p>Nobody ran pure Agile or pure Waterfall. Managers blended both depending on stakeholders, regulation, and team maturity, often delivering iteratively while reporting through traditional milestones.</p>
+        <blockquote>
+          <p>"You can't go full Agile or full Waterfall: report up one way and deliver down another."</p>
+          <cite>Programme Manager, TUI Airlines</cite>
+        </blockquote>
+      </div>
+      <div class="find">
+        <b>Finding 02</b>
+        <h3>Tools enable and constrain in equal measure</h3>
+        <p>Despite sophisticated platforms being available, Excel and PowerPoint remained the backbone. Fragmentation across tools created duplication and killed visibility.</p>
+        <blockquote>
+          <p>"Excel and PowerPoint are our backbone."</p>
+          <cite>Project Manager, TUI Airlines</cite>
+        </blockquote>
+      </div>
+      <div class="find">
+        <b>Finding 03</b>
+        <h3>Leadership is the integrator</h3>
+        <p>The strongest finding: trust, empathy, and cultural fluency mattered more than any framework. Adaptive leaders held hybrid delivery together where process alone could not.</p>
+        <blockquote>
+          <p>"Programme management is 70% leadership."</p>
+          <cite>Group Portfolio &amp; Programme Manager, TUI Airlines</cite>
+        </blockquote>
+      </div>
+      <div class="find">
+        <b>Finding 04</b>
+        <h3>Success is value, not just the iron triangle</h3>
+        <p>Practitioners defined excellence as benefit realisation, adoption, and sustainable change, not just hitting time, cost, and scope.</p>
+        <blockquote>
+          <p>"Tracking benefits matters more than hitting a timeline."</p>
+          <cite>Group Portfolio &amp; Programme Manager, TUI Airlines</cite>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FRAMEWORK ============ -->
+  <div class="bsheet">
+    <p class="beyebrow">The framework</p>
+    <h2>A Strategic Framework for Delivery Excellence</h2>
+    <p class="body">The findings converge into a Strategic Framework for Delivery Excellence. It positions transformation success as the interaction of three pillars: methodological adaptation, technological integration, and leadership adaptability, resting on governance, team culture, and continuous learning. Delivery excellence emerges from the interplay, not from optimising any single pillar.</p>
+
+    <div class="fx" role="img" aria-label="Framework diagram showing three pillars, methodological adaptation, technological integration and leadership adaptability, feeding into delivery excellence, supported by governance, team culture and continuous learning.">
+      <div class="fx-top">
+        <h3>Delivery Excellence</h3>
+        <ul>
+          <li>Value creation and benefit realisation</li>
+          <li>Stakeholder trust and alignment</li>
+          <li>Sustainable organisational learning</li>
+        </ul>
+      </div>
+      <div class="fx-arrows" aria-hidden="true">
+        <svg viewBox="0 0 16 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 19V2M2 8l6-6 6 6"/></svg>
+        <svg viewBox="0 0 16 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 19V2M2 8l6-6 6 6"/></svg>
+        <svg viewBox="0 0 16 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 19V2M2 8l6-6 6 6"/></svg>
+      </div>
+      <div class="fx-pillars">
+        <div class="fx-pillar">
+          <b>Methodological Adaptation</b>
+          <ul>
+            <li>Context-tailored hybrid frameworks</li>
+            <li>Balance of agility and governance</li>
+          </ul>
+        </div>
+        <div class="fx-pillar">
+          <b>Technological Integration</b>
+          <ul>
+            <li>Unified digital tools</li>
+            <li>Workflow automation</li>
+            <li>Real-time dashboards</li>
+          </ul>
+        </div>
+        <div class="fx-pillar">
+          <b>Leadership Adaptability</b>
+          <ul>
+            <li>Empathy and trust</li>
+            <li>Cultural awareness</li>
+            <li>Distributed leadership</li>
+          </ul>
+        </div>
+      </div>
+      <div class="fx-mid">
+        <div class="fx-sup">Organisational Governance &amp; Alignment</div>
+        <div class="fx-dbl" aria-hidden="true"><svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M8 3L4 7l4 4M16 3l4 4-4 4"/></svg></div>
+        <div class="fx-sup">Project Culture &amp; Team Collaboration</div>
+      </div>
+      <div class="fx-base">Continuous Improvement &amp; Learning</div>
+    </div>
+    <p class="cap">The Strategic Framework for Delivery Excellence developed from the findings.</p>
+  </div>
+
+  <!-- ============ TOOLS CHART ============ -->
+  <section class="t-block">
+    <p class="beyebrow">Tools in practice</p>
+    <h2>What people actually use</h2>
+    <p class="t-kicker-note">Tools referenced by the eleven interviewees. Basic Microsoft applications dominated despite more sophisticated platforms being available.</p>
+    <div class="chart" id="chart" role="img" aria-label="Horizontal bar chart of tool mentions across eleven interviews, with Excel highest at nine mentions and AI tools lowest at two.">
+      <div class="crow"><span class="clab">Excel</span><div class="ctrack"><div class="cfill" style="--w:100%; transition-delay:.0s"></div></div><span class="cval">9</span></div>
+      <div class="crow"><span class="clab">MS Teams</span><div class="ctrack"><div class="cfill" style="--w:88.9%; transition-delay:.06s"></div></div><span class="cval">8</span></div>
+      <div class="crow"><span class="clab">PowerPoint</span><div class="ctrack"><div class="cfill" style="--w:77.8%; transition-delay:.12s"></div></div><span class="cval">7</span></div>
+      <div class="crow"><span class="clab">SharePoint</span><div class="ctrack"><div class="cfill" style="--w:66.7%; transition-delay:.18s"></div></div><span class="cval">6</span></div>
+      <div class="crow"><span class="clab">Planner</span><div class="ctrack"><div class="cfill" style="--w:55.6%; transition-delay:.24s"></div></div><span class="cval">5</span></div>
+      <div class="crow"><span class="clab">Miro / Whiteboard</span><div class="ctrack"><div class="cfill" style="--w:44.4%; transition-delay:.30s"></div></div><span class="cval">4</span></div>
+      <div class="crow"><span class="clab">JIRA</span><div class="ctrack"><div class="cfill" style="--w:33.3%; transition-delay:.36s"></div></div><span class="cval">3</span></div>
+      <div class="crow"><span class="clab">OneNote</span><div class="ctrack"><div class="cfill" style="--w:33.3%; transition-delay:.42s"></div></div><span class="cval">3</span></div>
+      <div class="crow"><span class="clab">AI tools</span><div class="ctrack"><div class="cfill" style="--w:22.2%; transition-delay:.48s"></div></div><span class="cval">2</span></div>
+    </div>
+    <p class="cap" style="text-align:left">Number of mentions across eleven interviews.</p>
+  </section>
+
+  <!-- ============ RECOMMENDATIONS ============ -->
+  <div class="bsheet">
+    <p class="beyebrow">Recommendations</p>
+    <h2>Three strategic recommendations</h2>
+    <div class="rec-grid">
+      <div class="rec">
+        <b>01</b>
+        <h3>Build a unified digital delivery ecosystem</h3>
+        <p>An Integrated Delivery Management System built on the Microsoft Power Platform, connecting Teams, SharePoint, and Power BI into a single source of truth for planning, risk, and reporting.</p>
+      </div>
+      <div class="rec">
+        <b>02</b>
+        <h3>Embed adaptive leadership as a core capability</h3>
+        <p>A structured development framework using experiential learning, mentoring, and 360-degree feedback, so leadership agility grows alongside digital maturity.</p>
+      </div>
+      <div class="rec">
+        <b>03</b>
+        <h3>Institutionalise value-centric measurement</h3>
+        <p>A Delivery Excellence Framework combining traditional KPIs with benefit realisation, adoption rates, and stakeholder trust, embedded in project charters and governance.</p>
+      </div>
+    </div>
+
+    <p class="beyebrow" style="margin-top:38px">Implementation</p>
+    <h2>A phased roadmap</h2>
+    <p class="body">The recommendations are sequenced in three reinforcing phases.</p>
+    <div class="rd" role="img" aria-label="Three-phase roadmap moving from tool integration, to leadership enablement, to institutionalising delivery excellence over eighteen months and beyond.">
+      <div class="rd-phase"><b>Phase 1</b><h4>Tool Integration</h4><span>0-6 months</span></div>
+      <div class="rd-arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <div class="rd-phase"><b>Phase 2</b><h4>Leadership Enablement</h4><span>6-12 months</span></div>
+      <div class="rd-arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <div class="rd-phase"><b>Phase 3</b><h4>Institutionalising Delivery Excellence</h4><span>12-18 months+</span></div>
+    </div>
+    <p class="cap">Phased roadmap: each stage builds the foundation for the next.</p>
+  </div>
+
+  <!-- ============ DEMONSTRATES + CTA ============ -->
+  <section class="t-block">
+    <p class="beyebrow">What this project demonstrates</p>
+    <h2>Research that had to survive reality</h2>
+    <p class="t-kicker-note" style="margin-top:0">Interviewing senior stakeholders across five European entities, qualitative coding and thematic analysis, synthesising messy practitioner reality into a usable framework, and turning research into recommendations an organisation could actually implement, all delivered inside a live multinational transformation programme.</p>
+    <div class="t-tags">
+      <span>Digital Transformation</span>
+      <span>Hybrid Project Management</span>
+      <span>Adaptive Leadership</span>
+      <span>Delivery Excellence</span>
+      <span>Qualitative Research</span>
+      <span>Aviation</span>
+    </div>
+    <div class="t-cta">
+      <a class="bbtn bbtn--brass" href="mailto:mirabbasun@gmail.com?subject=Thesis%20request">Request the full thesis</a>
+      <span class="note">Happy to share the full document and talk through the method.</span>
+    </div>
+  </section>
+  </main>
+
+  <footer class="bfoot">
+    <span>&copy; <span id="year"></span> Mir Mahadi Abbas</span>
+    <a href="../../">mirmahadiabbas.com</a>
+  </footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  document.getElementById('year').textContent = new Date().getFullYear();
+  var chart = document.getElementById('chart');
+  if (!chart) return;
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { chart.classList.add('in'); io.unobserve(chart); }
+      });
+    }, { threshold: 0.35 });
+    io.observe(chart);
+  } else {
+    chart.classList.add('in');
+  }
+})();
+</script>
+</body>
+</html>
