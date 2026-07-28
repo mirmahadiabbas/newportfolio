@@ -110,8 +110,8 @@
 <section id="process-mapper" style="max-width: 860px; margin: 0 auto; padding: 2rem 1rem;">
   <h2>Process Description to Process Map</h2>
   <p style="font-size: 0.95rem;">
-    Describe a business process in plain English. Get back a structured breakdown,
-    a flowchart, and a Lean analysis of where the process may be leaking time.
+    Describe a business process in plain English. Get back a flowchart, the leak
+    points a Lean review would flag, and the questions a BA would ask next.
     Results appear below, usually within 20 seconds.
   </p>
 
@@ -119,7 +119,6 @@
     placeholder="Describe the process. For example: When a supplier invoice arrives by email, the finance assistant downloads it and checks whether it quotes a purchase order number..."
     style="width: 100%; box-sizing: border-box; padding: 0.75rem; font-family: inherit; font-size: 0.95rem;"></textarea>
 
-  <!-- honeypot -->
   <input type="text" id="pm_website" autocomplete="off" tabindex="-1"
     style="position: absolute; left: -9999px;" aria-hidden="true">
 
@@ -137,17 +136,19 @@
     <h3 id="pm_name" style="margin-bottom: 0.3rem;"></h3>
     <p id="pm_summary" style="font-size: 0.95rem;"></p>
 
-    <div id="pm_diagram_wrap" style="margin: 1.5rem 0;">
+    <div id="pm_stats" style="display: flex; gap: 0.6rem; flex-wrap: wrap; margin: 1rem 0;"></div>
+
+    <div id="pm_diagram_wrap" style="margin: 1.2rem 0;">
       <div id="pm_diagram" style="background: #ffffff; padding: 1rem; border-radius: 8px; overflow-x: auto;"></div>
       <button id="pm_copy" type="button"
         style="margin-top: 0.6rem; padding: 0.45rem 0.9rem; background: transparent; color: inherit;
         border: 1px solid currentColor; border-radius: 5px; cursor: pointer; font-size: 0.85rem;">Copy diagram code</button>
     </div>
 
-    <div id="pm_sections" style="display: grid; gap: 1.4rem; font-size: 0.93rem;"></div>
+    <div id="pm_sections" style="display: grid; gap: 1.6rem; font-size: 0.93rem;"></div>
 
     <p style="font-size: 0.8rem; opacity: 0.75; margin-top: 2rem;">
-      Analysis is generated from your description only. Waste and bottleneck items are
+      Analysis is generated from your description only. Leak points and bottlenecks are
       candidates to confirm with the process owner, not findings.
     </p>
   </div>
@@ -168,9 +169,53 @@ let currentMermaid = "";
 
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+const lines = s => String(s ?? "").split("\n").map(l => l.trim()).filter(Boolean);
+
 const block = (title, body) => body && body.trim()
   ? `<div><h4 style="margin:0 0 0.4rem;">${esc(title)}</h4>
      <div style="white-space:pre-wrap;">${esc(body)}</div></div>` : "";
+
+const statChip = (n, label) => (n && n !== "0")
+  ? `<span style="border:1px solid currentColor;border-radius:20px;padding:0.25rem 0.8rem;
+      font-size:0.85rem;opacity:0.9;"><strong>${esc(n)}</strong> ${esc(label)}</span>` : "";
+
+const badge = t => `<span style="display:inline-block;border:1px solid currentColor;
+  border-radius:4px;padding:0.05rem 0.45rem;font-size:0.78rem;opacity:0.85;
+  white-space:nowrap;">${esc(t)}</span>`;
+
+const tableWrap = rowsHtml => `<div style="overflow-x:auto;">
+  <table style="border-collapse:collapse;width:100%;font-size:0.9rem;">${rowsHtml}</table></div>`;
+
+const cell = (inner, isHeader) =>
+  `<${isHeader ? "th" : "td"} style="text-align:left;padding:0.45rem 0.7rem;
+    border-bottom:1px solid rgba(128,128,128,0.35);vertical-align:top;
+    ${isHeader ? "font-size:0.8rem;text-transform:uppercase;letter-spacing:0.04em;opacity:0.7;" : ""}">
+    ${inner}</${isHeader ? "th" : "td"}>`;
+
+function wasteTable(raw) {
+  const rows = lines(raw).map(l => l.split("|").map(p => p.trim()));
+  if (!rows.length || rows[0][0] === "None") return "";
+  const header = `<tr>${cell("Type", 1)}${cell("Where", 1)}${cell("Why it may leak", 1)}</tr>`;
+  const body = rows.map(r =>
+    `<tr>${cell(badge(r[0] || ""))}${cell(esc(r[1] || ""))}${cell(esc(r[2] || ""))}</tr>`).join("");
+  return `<div><h4 style="margin:0 0 0.5rem;">Where the process may leak</h4>${tableWrap(header + body)}</div>`;
+}
+
+function bottleneckTable(raw) {
+  const rows = lines(raw).map(l => l.split("|").map(p => p.trim()));
+  if (!rows.length || rows[0][0] === "None") return "";
+  const header = `<tr>${cell("Where", 1)}${cell("Why it gates flow", 1)}</tr>`;
+  const body = rows.map(r =>
+    `<tr>${cell(esc(r[0] || ""))}${cell(esc(r[1] || ""))}</tr>`).join("");
+  return `<div><h4 style="margin:0 0 0.5rem;">Bottleneck candidates</h4>${tableWrap(header + body)}</div>`;
+}
+
+const detail = (title, inner) => inner && inner.trim()
+  ? `<details style="border:1px solid currentColor;border-radius:8px;padding:0.6rem 0.9rem;opacity:0.9;">
+       <summary style="cursor:pointer;font-weight:600;">${esc(title)}</summary>
+       <div style="display:grid;gap:1.2rem;margin-top:0.9rem;">${inner}</div>
+     </details>` : "";
 
 $("pm_sample").addEventListener("click", () => { input.value = SAMPLE; status.textContent = ""; });
 
@@ -181,7 +226,7 @@ $("pm_copy").addEventListener("click", () => {
 });
 
 button.addEventListener("click", async () => {
-  if ($("pm_website").value) return;                 // bot
+  if ($("pm_website").value) return;
   const description = input.value.trim();
   if (description.length < 200) {
     status.textContent = "Please describe the process in a bit more detail (200 characters minimum).";
@@ -207,6 +252,13 @@ button.addEventListener("click", async () => {
     $("pm_name").textContent = d.process_name || "Process";
     $("pm_summary").textContent = d.summary || "";
 
+    $("pm_stats").innerHTML = [
+      statChip(d.step_count, "steps"),
+      statChip(d.decision_count, "decisions"),
+      statChip(d.actor_count, "actors"),
+      statChip(d.waste_count, "leak points")
+    ].join("");
+
     currentMermaid = d.mermaid_code || "";
     const target = $("pm_diagram");
     try {
@@ -219,14 +271,15 @@ button.addEventListener("click", async () => {
     }
 
     sections.innerHTML = [
-      block("Actors", d.actors),
-      block("Systems", d.systems),
-      block("Steps", d.steps),
-      block("Decision points", d.decisions),
-      block("Possible waste", d.waste_candidates),
-      block("Possible bottlenecks", d.bottlenecks),
+      wasteTable(d.waste_candidates),
+      bottleneckTable(d.bottlenecks),
       block("Quick wins to consider", d.quick_wins),
-      block("Questions for the process owner", d.questions_for_owner)
+      block("Questions a BA would ask the owner", d.questions_for_owner),
+      detail("Full breakdown - actors, systems, steps and decisions",
+        [ block("Actors", d.actors),
+          block("Systems", d.systems),
+          block("Steps", d.steps),
+          block("Decision points", d.decisions) ].join(""))
     ].join("");
 
     results.style.display = "block";
@@ -237,9 +290,7 @@ button.addEventListener("click", async () => {
     status.textContent = "That took too long or something went wrong. Try a shorter description.";
   } finally {
     button.disabled = false;
-    button.textContent = "Analyse process";
+    button.textContent = "Analysing process";
   }
 });
 </script>
-</body>
-</html>
