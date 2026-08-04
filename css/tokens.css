@@ -1,0 +1,60 @@
+/* ============================================================
+   TOKENS - the look of the whole site lives here.
+   Change a colour or font once and it updates everywhere.
+   Palette: deep pine + warm ivory + brass
+   Type:    Instrument Serif (display) + Archivo (body)
+            + JetBrains Mono (labels, dates, tags)
+   ============================================================ */
+
+:root {
+  /* ----- dark field (hero, gantt board, projects, contact) ----- */
+  --pine-950: #0B1912;
+  --pine-900: #10231A;
+  --pine-800: #16301F;
+  --pine-700: #23402C;
+
+  /* ----- light field (body sections) ----- */
+  --ivory:    #F4F0E4;
+  --ivory-2:  #ECE6D6;
+  --ivory-3:  #E4DDC9;
+
+  /* ----- ink on light ----- */
+  --ink:      #17281D;
+  --ink-soft: #2E4033;
+  --mute:     #5A675C;
+  --faint:    #8A948A;
+
+  /* ----- text on dark ----- */
+  --cream:      #F2EEDF;
+  --cream-70:   rgba(242, 238, 223, 0.72);
+  --cream-45:   rgba(242, 238, 223, 0.45);
+
+  /* ----- accents ----- */
+  --brass:      #C2932F;
+  --brass-hi:   #DBAE4A;
+  --brass-deep: #97701F;
+  --brass-soft: #E7D9AE;
+  --leaf:       #79B36A;   /* live / "now" / availability */
+
+  /* ----- lines & shadows ----- */
+  --line-dark:  rgba(242, 238, 223, 0.13);
+  --line-light: rgba(23, 40, 29, 0.14);
+  --line-faint: rgba(23, 40, 29, 0.08);
+  --shadow-sm:  0 2px 10px rgba(18, 30, 22, 0.06);
+  --shadow-md:  0 6px 22px rgba(18, 30, 22, 0.10);
+  --shadow-lg:  0 16px 44px rgba(8, 16, 11, 0.45);
+
+  /* ----- type ----- */
+  --font-display: 'Instrument Serif', Georgia, serif;
+  --font-body:    'Archivo', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono:    'JetBrains Mono', 'SF Mono', Consolas, monospace;
+
+  /* ----- shape & rhythm ----- */
+  --radius:     14px;
+  --radius-sm:  9px;
+  --radius-lg:  20px;
+  --maxw:       1120px;
+  --pad-x:      28px;
+  --section-y:  clamp(72px, 10vw, 120px);
+  --ease:       cubic-bezier(0.22, 0.61, 0.36, 1);
+}
