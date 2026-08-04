@@ -71,6 +71,115 @@
       <p class="blead">Scratch space for trying things out. Nothing links here and it is kept out of search results, but the address is still public: anyone with the URL, or reading the GitHub repo, can see whatever is on this page. Keep private material off it.</p>
       <p class="tb-flag">Not linked from the site</p>
 
+      <!-- ===== Sponsor Licence Search ===== -->
+<section id="sponsor-search" style="max-width: 860px; margin: 0 auto; padding: 2rem 1rem;">
+  <h2>UK Visa Sponsor Licence Search</h2>
+  <p style="font-size: 0.95rem;">
+    Search the UK Home Office register of licensed sponsors. Type a company name,
+    filter by route or location. Searches run against a live API, nothing is
+    downloaded to your device.
+  </p>
+
+  <input type="search" id="ss_query" placeholder="Company name, e.g. Tesco"
+    style="width: 100%; box-sizing: border-box; padding: 0.8rem; font-size: 1rem;">
+  <div style="display: flex; gap: 0.6rem; margin-top: 0.7rem; flex-wrap: wrap;">
+    <select id="ss_route" style="padding: 0.55rem; font-size: 0.9rem;">
+      <option value="">All routes</option>
+    </select>
+    <input type="text" id="ss_town" placeholder="Town or county"
+      style="padding: 0.55rem; font-size: 0.9rem; flex: 1; min-width: 140px;">
+  </div>
+
+  <p id="ss_status" style="font-size: 0.9rem; margin-top: 0.9rem;"></p>
+  <div id="ss_results" style="display: grid; gap: 0.7rem; margin-top: 0.5rem;"></div>
+  <button id="ss_more" type="button" style="display:none; margin-top: 0.8rem; padding: 0.6rem 1.2rem;
+    background: transparent; color: inherit; border: 1px solid currentColor;
+    border-radius: 6px; cursor: pointer;">Show more</button>
+
+  <p id="ss_footer" style="font-size: 0.8rem; opacity: 0.75; margin-top: 1.6rem;"></p>
+</section>
+
+<script>
+(function () {
+  const API = "https://sponsor-search.mirabbasun.workers.dev";
+  const PAGE = 50;
+
+  const $ = id => document.getElementById(id);
+  const query = $("ss_query"), route = $("ss_route"), town = $("ss_town");
+  const status = $("ss_status"), results = $("ss_results"), more = $("ss_more");
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  let rows = [], shown = 0;
+
+  fetch(API + "/api/meta").then(r => r.json()).then(m => {
+    for (const rt of m.routes) {
+      const o = document.createElement("option");
+      o.value = rt; o.textContent = rt;
+      route.appendChild(o);
+    }
+    $("ss_footer").innerHTML =
+      `Data from the UK Home Office register of licensed sponsors, as published on ` +
+      `<strong>${esc(m.updated)}</strong> (${m.count.toLocaleString()} entries). This is a ` +
+      `search of the public register, not immigration advice. A company not appearing here ` +
+      `may trade under a different legal name, or its status may have changed since this ` +
+      `date. Always confirm against the <a href="https://www.gov.uk/government/publications/` +
+      `register-of-licensed-sponsors-workers" target="_blank" rel="noopener">official GOV.UK register</a>.`;
+    status.textContent = "Start typing to search.";
+  }).catch(() => { status.textContent = "The search service could not be reached. Please refresh."; });
+
+  function render() {
+    const batch = rows.slice(shown, shown + PAGE);
+    results.insertAdjacentHTML("beforeend", batch.map(r => `
+      <div style="border:1px solid currentColor; border-radius:8px; padding:0.8rem 1rem; opacity:0.92;">
+        <div style="font-weight:600;">${esc(r.name)}</div>
+        <div style="font-size:0.85rem; opacity:0.85; margin-top:0.15rem;">
+          ${esc([r.town, r.county].filter(Boolean).join(", "))}</div>
+        <div style="margin-top:0.45rem; display:flex; gap:0.4rem; flex-wrap:wrap;">
+          <span style="border:1px solid currentColor; border-radius:4px; padding:0.05rem 0.5rem;
+            font-size:0.78rem;">${esc(r.route)}</span>
+          <span style="border:1px solid currentColor; border-radius:4px; padding:0.05rem 0.5rem;
+            font-size:0.78rem; opacity:0.8;">${esc(r.rating)}</span>
+        </div>
+      </div>`).join(""));
+    shown += batch.length;
+    more.style.display = shown < rows.length ? "inline-block" : "none";
+    more.textContent = `Show more (${rows.length - shown} loaded)`;
+  }
+
+  async function run() {
+    const q = query.value.trim(), rt = route.value, tw = town.value.trim();
+    results.innerHTML = ""; more.style.display = "none"; rows = []; shown = 0;
+    if (!q && !rt && !tw) { status.textContent = "Start typing to search."; return; }
+    if (q && q.length < 2) { status.textContent = "Type at least two characters."; return; }
+    status.textContent = "Searching...";
+    try {
+      const params = new URLSearchParams();
+      if (q) params.set("q", q);
+      if (rt) params.set("route", rt);
+      if (tw) params.set("town", tw);
+      const res = await fetch(API + "/api/search?" + params.toString());
+      const d = await res.json();
+      if (d.error) { status.textContent = "Please refine the search."; return; }
+      rows = d.rows;
+      status.textContent = d.count === 0
+        ? "No entries match. Check the spelling, or try part of the name - companies are " +
+          "listed under their registered legal name, which may differ from their trading name."
+        : d.capped
+          ? `Showing the first ${d.count} matches - narrow the search to see specific companies.`
+          : `${d.count.toLocaleString()} matching ${d.count === 1 ? "entry" : "entries"}`;
+      render();
+    } catch { status.textContent = "The search service could not be reached. Try again in a moment."; }
+  }
+
+  more.addEventListener("click", render);
+  let t;
+  const debounced = () => { clearTimeout(t); t = setTimeout(run, 300); };
+  query.addEventListener("input", debounced);
+  town.addEventListener("input", debounced);
+  route.addEventListener("change", run);
+})();
+</script>
       <!-- ==========================================================
            SCRATCH AREA
            Paste whatever you are testing between these markers.
