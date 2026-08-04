@@ -99,6 +99,81 @@
   <p id="ss_footer" style="font-size: 0.8rem; opacity: 0.75; margin-top: 1.6rem;"></p>
 </section>
 
+      <!-- ==========================================================
+           SCRATCH AREA
+           Paste whatever you are testing between these markers.
+           Delete the placeholder line below when you do.
+           Styles go in the <style> block at the top of this file,
+           scripts go in the <script> block at the bottom.
+           ========================================================== -->
+      <div class="tb-scratch" id="scratch">
+        <p class="tb-empty">Paste what you are testing here</p>
+      </div>
+      <!-- ====================== END SCRATCH ====================== -->
+
+      <details class="tb-ref">
+        <summary>Theme components you can paste in</summary>
+
+        <p class="tb-label">Buttons</p>
+        <div class="tb-row">
+          <button class="bbtn bbtn--brass" type="button">Primary action</button>
+          <button class="bbtn bbtn--ghost" type="button">Secondary</button>
+        </div>
+        <p class="tb-code">&lt;button class="bbtn bbtn--brass"&gt;Primary action&lt;/button&gt;
+&lt;button class="bbtn bbtn--ghost"&gt;Secondary&lt;/button&gt;</p>
+
+        <p class="tb-label">Form field</p>
+        <div class="bfield">
+          <label for="tb_demo">Field label</label>
+          <input type="text" id="tb_demo" placeholder="Type something">
+          <p class="bhint">Small hint text sits under the field.</p>
+        </div>
+        <p class="tb-code">&lt;div class="bfield"&gt;
+  &lt;label for="x"&gt;Field label&lt;/label&gt;
+  &lt;input type="text" id="x"&gt;
+  &lt;p class="bhint"&gt;Hint text&lt;/p&gt;
+&lt;/div&gt;</p>
+
+        <p class="tb-label">Result panels</p>
+        <div class="tb-grid2">
+          <div class="bresult"><div class="bnum">£270</div><div class="blabel">Big number</div></div>
+          <div class="bresult"><div class="bnum">12</div><div class="blabel">Second metric</div></div>
+        </div>
+        <p class="tb-code">&lt;div class="bresult"&gt;
+  &lt;div class="bnum"&gt;£270&lt;/div&gt;
+  &lt;div class="blabel"&gt;Big number&lt;/div&gt;
+&lt;/div&gt;</p>
+
+        <p class="tb-label">Note with a brass rule</p>
+        <p class="bnote">Use this for caveats, privacy lines, and anything that needs to be said plainly.</p>
+        <p class="tb-code">&lt;p class="bnote"&gt;Caveat text&lt;/p&gt;</p>
+
+        <p class="tb-label">Section heading inside a sheet</p>
+        <p class="tb-code">&lt;p class="beyebrow"&gt;Eyebrow&lt;/p&gt;
+&lt;h1&gt;Title with an &lt;em&gt;accent&lt;/em&gt; word&lt;/h1&gt;
+&lt;p class="blead"&gt;Lead paragraph&lt;/p&gt;</p>
+
+        <p class="tb-label">Useful CSS variables</p>
+        <p class="tb-code">--pine-950 #0B1912   dark background
+--ivory   #F4F0E4   sheet background
+--ink     #17281D   body text on ivory
+--mute    #5A675C   quiet text
+--brass   #C2932F   accent
+--leaf    #79B36A   success or live
+--font-display / --font-body / --font-mono
+--radius / --radius-sm / --radius-lg / --ease</p>
+      </details>
+    </div>
+  </main>
+
+  <footer class="bfoot">
+    <span>&copy; <span id="year"></span> Mir Mahadi Abbas</span>
+    <a href="../../">mirmahadiabbas.com</a>
+  </footer>
+</div>
+
+
+  /* ===== scripts for whatever you are testing go in here ===== */
 <script>
 (function () {
   const API = "https://sponsor-search.mirabbasun.workers.dev";
@@ -180,87 +255,6 @@
   route.addEventListener("change", run);
 })();
 </script>
-      <!-- ==========================================================
-           SCRATCH AREA
-           Paste whatever you are testing between these markers.
-           Delete the placeholder line below when you do.
-           Styles go in the <style> block at the top of this file,
-           scripts go in the <script> block at the bottom.
-           ========================================================== -->
-      <div class="tb-scratch" id="scratch">
-        <p class="tb-empty">Paste what you are testing here</p>
-      </div>
-      <!-- ====================== END SCRATCH ====================== -->
 
-      <details class="tb-ref">
-        <summary>Theme components you can paste in</summary>
-
-        <p class="tb-label">Buttons</p>
-        <div class="tb-row">
-          <button class="bbtn bbtn--brass" type="button">Primary action</button>
-          <button class="bbtn bbtn--ghost" type="button">Secondary</button>
-        </div>
-        <p class="tb-code">&lt;button class="bbtn bbtn--brass"&gt;Primary action&lt;/button&gt;
-&lt;button class="bbtn bbtn--ghost"&gt;Secondary&lt;/button&gt;</p>
-
-        <p class="tb-label">Form field</p>
-        <div class="bfield">
-          <label for="tb_demo">Field label</label>
-          <input type="text" id="tb_demo" placeholder="Type something">
-          <p class="bhint">Small hint text sits under the field.</p>
-        </div>
-        <p class="tb-code">&lt;div class="bfield"&gt;
-  &lt;label for="x"&gt;Field label&lt;/label&gt;
-  &lt;input type="text" id="x"&gt;
-  &lt;p class="bhint"&gt;Hint text&lt;/p&gt;
-&lt;/div&gt;</p>
-
-        <p class="tb-label">Result panels</p>
-        <div class="tb-grid2">
-          <div class="bresult"><div class="bnum">£270</div><div class="blabel">Big number</div></div>
-          <div class="bresult"><div class="bnum">12</div><div class="blabel">Second metric</div></div>
-        </div>
-        <p class="tb-code">&lt;div class="bresult"&gt;
-  &lt;div class="bnum"&gt;£270&lt;/div&gt;
-  &lt;div class="blabel"&gt;Big number&lt;/div&gt;
-&lt;/div&gt;</p>
-
-        <p class="tb-label">Note with a brass rule</p>
-        <p class="bnote">Use this for caveats, privacy lines, and anything that needs to be said plainly.</p>
-        <p class="tb-code">&lt;p class="bnote"&gt;Caveat text&lt;/p&gt;</p>
-
-        <p class="tb-label">Section heading inside a sheet</p>
-        <p class="tb-code">&lt;p class="beyebrow"&gt;Eyebrow&lt;/p&gt;
-&lt;h1&gt;Title with an &lt;em&gt;accent&lt;/em&gt; word&lt;/h1&gt;
-&lt;p class="blead"&gt;Lead paragraph&lt;/p&gt;</p>
-
-        <p class="tb-label">Useful CSS variables</p>
-        <p class="tb-code">--pine-950 #0B1912   dark background
---ivory   #F4F0E4   sheet background
---ink     #17281D   body text on ivory
---mute    #5A675C   quiet text
---brass   #C2932F   accent
---leaf    #79B36A   success or live
---font-display / --font-body / --font-mono
---radius / --radius-sm / --radius-lg / --ease</p>
-      </details>
-    </div>
-  </main>
-
-  <footer class="bfoot">
-    <span>&copy; <span id="year"></span> Mir Mahadi Abbas</span>
-    <a href="../../">mirmahadiabbas.com</a>
-  </footer>
-</div>
-
-<script>
-(function () {
-  'use strict';
-  document.getElementById('year').textContent = new Date().getFullYear();
-
-  /* ===== scripts for whatever you are testing go in here ===== */
-
-})();
-</script>
 </body>
 </html>
