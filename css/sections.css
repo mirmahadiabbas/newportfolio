@@ -5,7 +5,7 @@
 /* ============ HERO ============ */
 .hero {
   background: var(--pine-950);
-   object-fit: cover
+   object-fit: cover;
   color: var(--cream-70);
   padding: 168px 0 80px;
   position: relative;
