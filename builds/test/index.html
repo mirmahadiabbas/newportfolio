@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test bench · Mir Mahadi Abbas</title>
+
+<!-- unlisted: not linked from anywhere, kept out of search results -->
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- shared Builds theme: everything on the builds pages is available here -->
+<link rel="stylesheet" href="../builds.css">
+
+<style>
+  /* ===== put styles for whatever you are testing in here ===== */
+
+  .tb-flag {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--brass-hi);
+    border: 1px dashed rgba(194, 147, 47, 0.6);
+    border-radius: 999px; padding: 5px 13px;
+  }
+  .tb-scratch {
+    border: 1px dashed rgba(194, 147, 47, 0.55);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    margin-top: 8px;
+  }
+  .tb-scratch > .tb-empty {
+    font-family: var(--font-mono); font-size: 12px;
+    color: var(--mute); text-align: center; padding: 26px 0;
+  }
+  .tb-ref { margin-top: 26px; }
+  .tb-ref summary { cursor: pointer; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
+  .tb-ref summary:hover { color: var(--brass-deep); }
+  .tb-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin: 14px 0 22px; }
+  .tb-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .tb-code {
+    font-family: var(--font-mono); font-size: 11.5px; line-height: 1.7;
+    background: var(--ivory-2); border: 1px solid var(--line-light);
+    border-radius: var(--radius-sm); padding: 12px 14px;
+    white-space: pre-wrap; color: var(--ink-soft); overflow-x: auto;
+  }
+  .tb-label { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mute); margin: 20px 0 8px; }
+  @media (max-width: 620px) { .tb-grid2 { grid-template-columns: 1fr; } }
+
+  /* =====================================================================
+     SITE ASSISTANT (under test)
+     Everything prefixed .as- belongs to the assistant, so it can later be
+     lifted out into one self-contained file for every page.
+     ===================================================================== */
+  .as {
+    background: var(--pine-950);
+    color: var(--cream);
+    border-radius: var(--radius);
+    display: flex; flex-direction: column;
+    min-height: 520px;
+    overflow: hidden;
+  }
+  .as-head {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--line-dark);
+  }
+  .as-title { font-family: var(--font-display); font-size: 24px; line-height: 1.1; margin-right: auto; }
+  .as-title em { color: var(--brass-hi); font-style: italic; }
+  .as-state {
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 999px;
+    display: inline-flex; align-items: center; gap: 7px;
+    color: var(--cream-45); border: 1px solid var(--line-dark);
+  }
+  .as-state::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .as-state[data-s="live"] { color: var(--leaf); border-color: rgba(121, 179, 106, 0.4); }
+  .as-state[data-s="mock"] { color: var(--brass-hi); border-color: rgba(194, 147, 47, 0.5); }
+  .as-new {
+    font-family: var(--font-mono); font-size: 10.5px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--cream-70);
+    padding: 6px 10px; border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+  }
+  .as-new:hover, .as-new:focus-visible { color: var(--brass-hi); border-color: var(--line-dark); }
+  .as-new[hidden] { display: none; }
+
+  .as-log {
+    flex: 1;
+    padding: 22px 20px 8px;
+    overflow-y: auto;
+    max-height: 560px;
+    scroll-behavior: smooth;
+  }
+
+  /* empty state */
+  .as-intro { max-width: 520px; color: var(--cream-70); font-size: 14.5px; margin-bottom: 18px; }
+  .as-starters { display: flex; flex-wrap: wrap; gap: 8px; }
+  .as-chip {
+    font-size: 13.5px; text-align: left;
+    color: var(--cream);
+    border: 1px solid var(--line-dark);
+    background: var(--pine-900);
+    border-radius: 999px;
+    padding: 8px 15px;
+    transition: border-color .2s, color .2s, transform .2s var(--ease);
+  }
+  .as-chip:hover, .as-chip:focus-visible { border-color: var(--brass); color: var(--brass-hi); transform: translateY(-1px); }
+
+  /* turns */
+  .as-q {
+    margin: 18px 0 12px auto;
+    max-width: 82%;
+    width: fit-content;
+    background: var(--pine-800);
+    border: 1px solid rgba(194, 147, 47, 0.35);
+    border-radius: 14px 14px 4px 14px;
+    padding: 10px 14px;
+    font-size: 14.5px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .as-q:first-child { margin-top: 0; }
+  .as-a { max-width: 640px; font-size: 15px; line-height: 1.65; color: var(--cream); overflow-wrap: anywhere; }
+  .as-a p + p, .as-a p + ul, .as-a ul + p { margin-top: 10px; }
+  .as-a ul { list-style: none; padding: 0; }
+  .as-a li { position: relative; padding-left: 18px; margin: 4px 0; }
+  .as-a li::before { content: ""; position: absolute; left: 0; top: 11px; width: 7px; height: 1.5px; background: var(--brass); }
+  .as-a strong { color: var(--brass-hi); font-weight: 600; }
+
+  .as-src { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+  .as-src a {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.05em;
+    color: var(--brass-hi);
+    border: 1px solid rgba(194, 147, 47, 0.4);
+    border-radius: 999px;
+    padding: 4px 11px;
+  }
+  .as-src a:hover, .as-src a:focus-visible { background: rgba(194, 147, 47, 0.12); }
+  .as-src svg { width: 11px; height: 11px; }
+  .as-note { font-family: var(--font-mono); font-size: 11px; color: var(--cream-45); margin-top: 8px; }
+
+  .as-err {
+    margin-top: 6px;
+    border: 1px solid rgba(194, 147, 47, 0.5);
+    background: rgba(194, 147, 47, 0.08);
+    color: var(--brass-hi);
+    border-radius: var(--radius-sm);
+    padding: 10px 13px;
+    font-size: 13.5px;
+  }
+  .as-err button { text-decoration: underline; margin-left: 6px; color: var(--cream); }
+
+  .as-dots { display: inline-flex; gap: 5px; padding: 8px 0; }
+  .as-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--brass); opacity: .3; animation: as-blink 1.2s infinite; }
+  .as-dots i:nth-child(2) { animation-delay: .2s; }
+  .as-dots i:nth-child(3) { animation-delay: .4s; }
+  @keyframes as-blink { 0%, 100% { opacity: .25; } 40% { opacity: 1; } }
+
+  /* composer */
+  .as-form { border-top: 1px solid var(--line-dark); padding: 14px 16px 12px; }
+  .as-row {
+    display: flex; gap: 10px; align-items: flex-end;
+    background: var(--pine-900);
+    border: 1px solid var(--line-dark);
+    border-radius: var(--radius-sm);
+    padding: 6px 6px 6px 14px;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .as-row:focus-within { border-color: var(--brass); box-shadow: 0 0 0 3px rgba(194, 147, 47, 0.16); }
+  .as-input {
+    flex: 1;
+    background: transparent; border: 0; outline: none; resize: none;
+    color: var(--cream);
+    font: inherit; font-size: 16px; line-height: 1.5;
+    padding: 7px 0;
+    max-height: 140px;
+  }
+  .as-input::placeholder { color: var(--cream-45); }
+  .as-send {
+    width: 40px; height: 40px; flex: none;
+    border-radius: 8px;
+    background: var(--brass); color: var(--pine-950);
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: background .2s, opacity .2s;
+  }
+  .as-send:hover { background: var(--brass-hi); }
+  .as-send:disabled { opacity: .4; cursor: not-allowed; }
+  .as-send svg { width: 18px; height: 18px; }
+  .as-send[data-mode="stop"] { background: var(--pine-700); color: var(--cream); }
+  .as-meta {
+    display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    margin-top: 9px;
+    font-size: 12px; color: var(--cream-45);
+  }
+  .as-meta a { color: var(--cream-70); text-decoration: underline; text-underline-offset: 2px; }
+  .as-meta a:hover { color: var(--brass-hi); }
+  .as-count[data-warn="1"] { color: var(--brass-hi); }
+
+  .as-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  @media (max-width: 620px) {
+    /* reclaim the nested padding so the panel gets the phone's width */
+    .tb-scratch { padding: 0; border: 0; }
+    .as { margin: 0 calc(-1 * clamp(28px, 5vw, 52px) + 10px); min-height: 460px; }
+    .as-q { max-width: 92%; }
+    .as-log { padding: 18px 14px 6px; }
+    .as-head { padding: 14px; gap: 8px; }
+    .as-title { font-size: 20px; }
+    .as-state { padding: 3px 8px; letter-spacing: 0.1em; }
+    .as-new { padding: 4px 0; }
+    .as-form { padding: 12px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .as-dots i { animation: none; opacity: .7; }
+    .as-log { scroll-behavior: auto; }
+    .as-chip:hover { transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bwrap">
+  <div class="btop">
+    <a class="btop-name" href="../../">Mir Mahadi <em>Abbas</em></a>
+    <a class="bback" href="../">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+      All builds
+    </a>
+  </div>
+
+  <main class="bpage">
+    <div class="bsheet">
+      <p class="beyebrow">Private · unlisted</p>
+      <h1>Test <em>bench</em></h1>
+      <p class="blead">Scratch space for trying things out. Nothing links here and it is kept out of search results, but the address is still public: anyone with the URL, or reading the GitHub repo, can see whatever is on this page. Keep private material off it.</p>
+      <p class="tb-flag">Not linked from the site</p>
+
+      <!-- ==========================================================
+           SCRATCH AREA
+           Paste whatever you are testing between these markers.
+           Delete the placeholder line below when you do.
+           Styles go in the <style> block at the top of this file,
+           scripts go in the <script> block at the bottom.
+           ========================================================== -->
+      <div class="tb-scratch" id="scratch">
+
+        <section class="as" id="as" aria-label="Ask about Mir">
+          <div class="as-head">
+            <h2 class="as-title">Ask about <em>Mir</em></h2>
+            <span class="as-state" id="asState" data-s="wait">Connecting</span>
+            <button class="as-new" id="asNew" type="button" hidden>New conversation</button>
+          </div>
+
+          <div class="as-log" id="asLog">
+            <div id="asEmpty">
+              <p class="as-intro">Ask about Mir's experience, education, projects or availability. Answers come only from his CV and this website, with a link to where each one comes from.</p>
+              <div class="as-starters" id="asStarters"></div>
+            </div>
+          </div>
+
+          <form class="as-form" id="asForm" autocomplete="off">
+            <div class="as-row">
+              <label class="as-sr" for="asInput">Your question</label>
+              <textarea class="as-input" id="asInput" rows="1" maxlength="1200" placeholder="Ask a question about Mir"></textarea>
+              <button class="as-send" id="asSend" type="submit" aria-label="Send question" data-mode="send">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </button>
+            </div>
+            <div class="as-meta">
+              <span>AI answers from Mir's CV and this site. They can be wrong, so check the linked source. This site keeps no record of your questions; they are sent to Anthropic's Claude API to generate the answer.</span>
+              <span><span class="as-count" id="asCount"></span> <a id="asMail" href="mailto:mirabbasun@gmail.com">Email Mir instead</a></span>
+            </div>
+          </form>
+          <div class="as-sr" id="asAnnounce" aria-live="polite"></div>
+        </section>
+
+      </div>
+      <!-- ====================== END SCRATCH ====================== -->
+
+      <details class="tb-ref">
+        <summary>Theme components you can paste in</summary>
+
+        <p class="tb-label">Buttons</p>
+        <div class="tb-row">
+          <button class="bbtn bbtn--brass" type="button">Primary action</button>
+          <button class="bbtn bbtn--ghost" type="button">Secondary</button>
+        </div>
+        <p class="tb-code">&lt;button class="bbtn bbtn--brass"&gt;Primary action&lt;/button&gt;
+&lt;button class="bbtn bbtn--ghost"&gt;Secondary&lt;/button&gt;</p>
+
+        <p class="tb-label">Form field</p>
+        <div class="bfield">
+          <label for="tb_demo">Field label</label>
+          <input type="text" id="tb_demo" placeholder="Type something">
+          <p class="bhint">Small hint text sits under the field.</p>
+        </div>
+        <p class="tb-code">&lt;div class="bfield"&gt;
+  &lt;label for="x"&gt;Field label&lt;/label&gt;
+  &lt;input type="text" id="x"&gt;
+  &lt;p class="bhint"&gt;Hint text&lt;/p&gt;
+&lt;/div&gt;</p>
+
+        <p class="tb-label">Result panels</p>
+        <div class="tb-grid2">
+          <div class="bresult"><div class="bnum">£270</div><div class="blabel">Big number</div></div>
+          <div class="bresult"><div class="bnum">12</div><div class="blabel">Second metric</div></div>
+        </div>
+        <p class="tb-code">&lt;div class="bresult"&gt;
+  &lt;div class="bnum"&gt;£270&lt;/div&gt;
+  &lt;div class="blabel"&gt;Big number&lt;/div&gt;
+&lt;/div&gt;</p>
+
+        <p class="tb-label">Note with a brass rule</p>
+        <p class="bnote">Use this for caveats, privacy lines, and anything that needs to be said plainly.</p>
+        <p class="tb-code">&lt;p class="bnote"&gt;Caveat text&lt;/p&gt;</p>
+
+        <p class="tb-label">Section heading inside a sheet</p>
+        <p class="tb-code">&lt;p class="beyebrow"&gt;Eyebrow&lt;/p&gt;
+&lt;h1&gt;Title with an &lt;em&gt;accent&lt;/em&gt; word&lt;/h1&gt;
+&lt;p class="blead"&gt;Lead paragraph&lt;/p&gt;</p>
+
+        <p class="tb-label">Useful CSS variables</p>
+        <p class="tb-code">--pine-950 #0B1912   dark background
+--ivory   #F4F0E4   sheet background
+--ink     #17281D   body text on ivory
+--mute    #5A675C   quiet text
+--brass   #C2932F   accent
+--leaf    #79B36A   success or live
+--font-display / --font-body / --font-mono
+--radius / --radius-sm / --radius-lg / --ease</p>
+      </details>
+    </div>
+  </main>
+
+  <footer class="bfoot">
+    <span>&copy; <span id="year"></span> Mir Mahadi Abbas</span>
+    <a href="../../">mirmahadiabbas.com</a>
+  </footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  /* ===== scripts for whatever you are testing go in here ===== */
+
+})();
+
+/* =====================================================================
+   SITE ASSISTANT (under test)
+   Talks to the Cloudflare Worker. The page never sees the API key.
+
+   Add ?mock=1 to the address to preview the interface with canned
+   answers and no AI. Add ?endpoint=http://localhost:8787 to point it
+   at a local Worker (wrangler dev).
+   ===================================================================== */
+(function () {
+  'use strict';
+
+  var DEFAULT_ENDPOINT = 'https://mir-assistant.mirabbasun.workers.dev';
+  var EMAIL = 'mirabbasun@gmail.com';
+  var MAX_CHARS = 1200;
+  var FALLBACK_STARTERS = [
+    'What did Mir do at TUI Airlines?',
+    'What has he built with AI?',
+    'What kind of roles is he looking for?',
+    'Tell me about his consulting experience'
+  ];
+
+  var qs = new URLSearchParams(location.search);
+  var MOCK = qs.get('mock') === '1';
+  var ENDPOINT = (qs.get('endpoint') || DEFAULT_ENDPOINT).replace(/\/+$/, '');
+
+  var el = {
+    state: document.getElementById('asState'),
+    log: document.getElementById('asLog'),
+    empty: document.getElementById('asEmpty'),
+    starters: document.getElementById('asStarters'),
+    form: document.getElementById('asForm'),
+    input: document.getElementById('asInput'),
+    send: document.getElementById('asSend'),
+    count: document.getElementById('asCount'),
+    mail: document.getElementById('asMail'),
+    fresh: document.getElementById('asNew'),
+    announce: document.getElementById('asAnnounce')
+  };
+
+  var history = [];      // [{role, content}] as sent to the Worker
+  var busy = false;
+  var controller = null;
+
+  var ICON_OUT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17L17 7M7 7h10v10"/></svg>';
+  var ICON_SEND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  var ICON_STOP = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1.5"/></svg>';
+
+  /* ---------- helpers ---------- */
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  /* The only formatting allowed: paragraphs, "- " bullets, **bold**.
+     Everything is escaped first, so nothing the model writes can
+     become markup or a link. */
+  function render(text) {
+    var blocks = esc(text).split(/\n{2,}/);
+    return blocks.map(function (b) {
+      var lines = b.split('\n');
+      var bullets = lines.filter(function (l) { return /^\s*[-*] /.test(l); });
+      var html;
+      if (bullets.length && bullets.length === lines.filter(function (l) { return l.trim(); }).length) {
+        html = '<ul>' + lines.filter(function (l) { return l.trim(); }).map(function (l) {
+          return '<li>' + l.replace(/^\s*[-*] /, '') + '</li>';
+        }).join('') + '</ul>';
+      } else if (bullets.length) {
+        // a lead-in line followed by bullets
+        var out = [], list = [];
+        lines.forEach(function (l) {
+          if (/^\s*[-*] /.test(l)) { list.push('<li>' + l.replace(/^\s*[-*] /, '') + '</li>'); }
+          else if (l.trim()) {
+            if (list.length) { out.push('<ul>' + list.join('') + '</ul>'); list = []; }
+            out.push('<p>' + l + '</p>');
+          }
+        });
+        if (list.length) out.push('<ul>' + list.join('') + '</ul>');
+        html = out.join('');
+      } else {
+        html = '<p>' + lines.join('<br>') + '</p>';
+      }
+      return html;
+    }).join('').replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+  }
+
+  function setState(s, label) {
+    el.state.setAttribute('data-s', s);
+    el.state.textContent = label;
+  }
+
+  function scrollDown() { el.log.scrollTop = el.log.scrollHeight; }
+
+  function setBusy(b) {
+    busy = b;
+    el.send.setAttribute('data-mode', b ? 'stop' : 'send');
+    el.send.setAttribute('aria-label', b ? 'Stop the answer' : 'Send question');
+    el.send.innerHTML = b ? ICON_STOP : ICON_SEND;
+    el.log.setAttribute('aria-busy', b ? 'true' : 'false');
+    updateSend();
+  }
+
+  function updateSend() {
+    var n = el.input.value.length;
+    el.send.disabled = !busy && el.input.value.trim().length === 0;
+    el.count.textContent = n > MAX_CHARS * 0.75 ? n + ' / ' + MAX_CHARS : '';
+    el.count.setAttribute('data-warn', n > MAX_CHARS * 0.9 ? '1' : '0');
+  }
+
+  function autosize() {
+    el.input.style.height = 'auto';
+    el.input.style.height = Math.min(el.input.scrollHeight, 140) + 'px';
+  }
+
+  function updateMail(lastQ) {
+    var body = lastQ
+      ? 'Hi Mir,\n\nI was asking your site assistant:\n"' + lastQ + '"\n\n'
+      : 'Hi Mir,\n\n';
+    el.mail.href = 'mailto:' + EMAIL + '?subject=' + encodeURIComponent('Question from your website') + '&body=' + encodeURIComponent(body);
+  }
+
+  /* Keep the history within the Worker's limits: at most 5 earlier
+     exchanges and about 12,000 characters, dropping the oldest first. */
+  function trimmedHistory(q) {
+    var past = history.slice(-10);
+    function size(arr) { return arr.reduce(function (n, m) { return n + m.content.length; }, 0); }
+    while (past.length && size(past) + q.length > 12000) past = past.slice(2);
+    return past.concat([{ role: 'user', content: q }]);
+  }
+
+  /* ---------- starters ---------- */
+
+  function showStarters(list) {
+    el.starters.innerHTML = '';
+    list.forEach(function (s) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'as-chip';
+      b.textContent = s;
+      b.addEventListener('click', function () { ask(s); });
+      el.starters.appendChild(b);
+    });
+  }
+
+  /* ---------- one turn ---------- */
+
+  function ask(q) {
+    q = q.trim();
+    if (!q || busy) return;
+    if (q.length > MAX_CHARS) q = q.slice(0, MAX_CHARS);
+
+    el.empty.hidden = true;
+    el.fresh.hidden = false;
+    el.input.value = '';
+    autosize();
+    updateMail(q);
+
+    var qEl = document.createElement('div');
+    qEl.className = 'as-q';
+    qEl.textContent = q;
+    el.log.appendChild(qEl);
+
+    var aEl = document.createElement('div');
+    aEl.className = 'as-a';
+    aEl.innerHTML = '<span class="as-dots" aria-label="Writing an answer"><i></i><i></i><i></i></span>';
+    el.log.appendChild(aEl);
+    scrollDown();
+
+    setBusy(true);
+    var text = '';
+    var messages = trimmedHistory(q);
+
+    var source = MOCK ? mockStream(q) : liveStream(messages);
+
+    source.onDelta = function (t) {
+      text += t;
+      aEl.innerHTML = render(text);
+      scrollDown();
+    };
+
+    source.onDone = function (info) {
+      if (!text) aEl.innerHTML = info.stopped ? '' : render('No answer came back. Try rephrasing the question.');
+      if (info.sources && info.sources.length) {
+        var src = document.createElement('div');
+        src.className = 'as-src';
+        info.sources.forEach(function (s) {
+          // only ever link to the site, LinkedIn or email
+          if (!/^(https:\/\/(www\.)?mirmahadiabbas\.com\/|https:\/\/(www\.)?linkedin\.com\/|mailto:)/.test(s.url)) return;
+          var a = document.createElement('a');
+          a.href = s.url;
+          a.innerHTML = ICON_OUT + '<span></span>';
+          a.lastChild.textContent = s.label;
+          src.appendChild(a);
+        });
+        aEl.appendChild(src);
+      }
+      if (info.truncated) {
+        var n = document.createElement('p');
+        n.className = 'as-note';
+        n.textContent = 'That answer was cut short. Ask a narrower question for the rest.';
+        aEl.appendChild(n);
+      }
+      if (info.stopped) {
+        var st = document.createElement('p');
+        st.className = 'as-note';
+        st.textContent = 'Stopped.';
+        aEl.appendChild(st);
+      }
+      if (text) {
+        history.push({ role: 'user', content: q });
+        history.push({ role: 'assistant', content: text });
+      }
+      el.announce.textContent = text;
+      setBusy(false);
+      scrollDown();
+      el.input.focus();
+    };
+
+    source.onError = function (msg) {
+      if (!text) aEl.innerHTML = '';
+      var e = document.createElement('div');
+      e.className = 'as-err';
+      e.textContent = msg + ' ';
+      var retry = document.createElement('button');
+      retry.type = 'button';
+      retry.textContent = 'Try again';
+      retry.addEventListener('click', function () {
+        qEl.remove(); aEl.remove();
+        ask(q);
+      });
+      e.appendChild(retry);
+      aEl.appendChild(e);
+      el.announce.textContent = msg;
+      setBusy(false);
+      scrollDown();
+    };
+
+    source.start();
+  }
+
+  /* ---------- talking to the Worker ---------- */
+
+  function liveStream(messages) {
+    var s = {};
+    s.start = function () {
+      controller = new AbortController();
+      fetch(ENDPOINT + '/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: messages }),
+        signal: controller.signal
+      }).then(function (res) {
+        var ct = res.headers.get('content-type') || '';
+        if (!res.ok || ct.indexOf('text/event-stream') === -1) {
+          return res.json().catch(function () { return {}; }).then(function (j) {
+            s.onError(j.error || 'The assistant is unavailable right now. You can email Mir instead.');
+          });
+        }
+        return readSSE(res.body, s);
+      }).catch(function (err) {
+        if (err && err.name === 'AbortError') { s.onDone({ stopped: true }); return; }
+        s.onError('Could not reach the assistant. Check your connection, or email Mir instead.');
+      });
+    };
+    return s;
+  }
+
+  function readSSE(body, s) {
+    var reader = body.getReader();
+    var dec = new TextDecoder();
+    var buf = '';
+    var finished = false;
+    function pump() {
+      return reader.read().then(function (r) {
+        if (r.done) {
+          if (!finished) s.onError('The answer stopped early. Try again.');
+          return;
+        }
+        buf += dec.decode(r.value, { stream: true });
+        var i;
+        while ((i = buf.indexOf('\n\n')) !== -1) {
+          var block = buf.slice(0, i);
+          buf = buf.slice(i + 2);
+          var ev = (block.match(/^event: (.*)$/m) || [])[1];
+          var raw = (block.match(/^data: (.*)$/m) || [])[1];
+          if (!raw) continue;
+          var data;
+          try { data = JSON.parse(raw); } catch (e) { continue; }
+          if (ev === 'delta') s.onDelta(data.t || '');
+          else if (ev === 'done') { finished = true; s.onDone(data); }
+          else if (ev === 'error') { finished = true; s.onError(data.message || 'Something went wrong.'); }
+        }
+        return pump();
+      });
+    }
+    return pump().catch(function (err) {
+      if (err && err.name === 'AbortError') { if (!finished) s.onDone({ stopped: true }); return; }
+      if (!finished) s.onError('The connection dropped. Try again.');
+    });
+  }
+
+  /* ---------- preview mode: canned answers, no AI ---------- */
+
+  var MOCK_ANSWERS = [
+    { k: /tui/i, t: 'Mir was a Project Management Intern in the PMO at TUI Airlines from June to September 2025, on the Advance Crew Management System programme across five European airline entities.\n\n- Ran current-state analysis through interviews with subject matter experts\n- Built weighted RFI and RFP scorecards that fed the steering committee\'s vendor selection\n- Produced the programme\'s PID, RACI matrix and RAID log',
+      s: [{ id: 'tui', label: 'TUI Airlines', url: 'https://mirmahadiabbas.com/#xp-tui' }] },
+    { k: /built|ai\b|automation/i, t: 'He builds practical AI and automation tools, several of which you can try on his Builds page. Examples include a **process description to process map** tool, an **AI meeting minutes** service that emails a PDF, and a job discovery pipeline that scores listings with Claude.',
+      s: [{ id: 'builds', label: 'Builds page', url: 'https://mirmahadiabbas.com/builds/' }, { id: 'automation-projects', label: 'Automation projects', url: 'https://mirmahadiabbas.com/#projects' }] },
+    { k: /role|looking|available/i, t: 'Mir is open to work and looking for consulting, PMO and business analyst roles in the UK. He also takes on freelance projects. The best way to reach him is email at ' + EMAIL + '.',
+      s: [{ id: 'looking-for', label: 'Contact and availability', url: 'https://mirmahadiabbas.com/#contact' }] },
+    { k: /consult/i, t: 'At WSPL in Bengaluru, from November 2023 to September 2024, Mir was an Associate Consultant and supported the CEO directly. He delivered competitor benchmarking and pricing analysis for Topiq, a GenAI SaaS that secured a $1M seed round, and led a digital revamp for Truedigital that generated 30+ leads in its first month.',
+      s: [{ id: 'wspl', label: 'WSPL', url: 'https://mirmahadiabbas.com/#xp-wspl' }] }
+  ];
+
+  function mockStream(q) {
+    var s = {};
+    var hit = MOCK_ANSWERS.filter(function (m) { return m.k.test(q); })[0];
+    var reply = hit ? hit.t : 'Preview mode only answers the suggested questions. Remove ?mock=1 from the address to use the real assistant.';
+    var sources = hit ? hit.s : [];
+    var cancelled = false;
+    s.start = function () {
+      controller = { abort: function () { cancelled = true; } };
+      var words = reply.match(/\S+\s*/g) || [];
+      var i = 0;
+      setTimeout(function tick() {
+        if (cancelled) { s.onDone({ stopped: true }); return; }
+        if (i >= words.length) { s.onDone({ sources: sources }); return; }
+        s.onDelta(words[i++]);
+        setTimeout(tick, 28);
+      }, 450);
+    };
+    return s;
+  }
+
+  /* ---------- wiring ---------- */
+
+  el.form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (busy) { if (controller) controller.abort(); return; }
+    ask(el.input.value);
+  });
+
+  el.input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
+      e.preventDefault();
+      if (!busy) ask(el.input.value);
+    }
+  });
+  el.input.addEventListener('input', function () { autosize(); updateSend(); });
+
+  el.fresh.addEventListener('click', function () {
+    if (busy && controller) controller.abort();
+    history = [];
+    Array.prototype.slice.call(el.log.children).forEach(function (c) { if (c !== el.empty) c.remove(); });
+    el.empty.hidden = false;
+    el.fresh.hidden = true;
+    updateMail('');
+    el.input.focus();
+  });
+
+  updateSend();
+  updateMail('');
+
+  if (MOCK) {
+    setState('mock', 'Preview: no AI');
+    showStarters(FALLBACK_STARTERS);
+  } else {
+    showStarters(FALLBACK_STARTERS);
+    fetch(ENDPOINT + '/api/meta').then(function (r) {
+      if (!r.ok) throw new Error('meta ' + r.status);
+      return r.json();
+    }).then(function (m) {
+      if (m.starters && m.starters.length) showStarters(m.starters);
+      setState('live', 'Live');
+    }).catch(function () {
+      setState('off', 'Offline');
+    });
+  }
+})();
+</script>
+</body>
+</html>
