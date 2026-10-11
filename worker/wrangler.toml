@@ -1,0 +1,38 @@
+# Cloudflare Worker config for the site assistant.
+# The API key is NOT in this file. Set it once with:
+#   npx wrangler secret put ANTHROPIC_API_KEY
+
+name = "mir-assistant"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+[vars]
+# Only pages on these origins can use the assistant. Add
+# http://localhost:8000 while testing locally, remove it after.
+ALLOWED_ORIGINS = "https://mirmahadiabbas.com,https://www.mirmahadiabbas.com,https://mirmahadiabbas.github.io"
+MODEL = "claude-haiku-5-5"
+MAX_TOKENS = "700"
+DAILY_CAP = "300"
+
+# Per visitor: at most 8 questions a minute.
+[[ratelimits]]
+name = "BURST"
+namespace_id = "2611"
+
+  [ratelimits.simple]
+  limit = 8
+  period = 60
+
+# Daily question cap and the health check result live here.
+# Create it with:  npx wrangler kv namespace create USAGE
+# then paste the id it prints below.
+[[kv_namespaces]]
+binding = "USAGE"
+id = "PASTE_KV_NAMESPACE_ID_HERE"
+
+# Health check: one tiny API call every morning at 07:00 UTC.
+[triggers]
+crons = ["0 7 * * *"]
+
+[observability]
+enabled = true
