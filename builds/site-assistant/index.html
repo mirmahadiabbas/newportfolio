@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Site Assistant · Builds · Mir Mahadi Abbas</title>
+<meta name="description" content="An AI assistant that answers questions about Mir's experience and projects from his CV and website, cites its sources, and runs behind a Cloudflare Worker with rate limits, a daily cap and a test suite.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Site Assistant · Mir Mahadi Abbas">
+<meta property="og:description" content="Ask about Mir's work. Answers come only from his CV and site, with a link to the source of each one.">
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- shared Builds theme -->
+<link rel="stylesheet" href="../builds.css">
+
+<!-- styles specific to this page -->
+<style>
+  .sa-status {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: #3F7A33;
+    background: rgba(121, 179, 106, 0.14);
+    border: 1px solid rgba(79, 138, 65, 0.45);
+    border-radius: 999px; padding: 4px 11px;
+    margin-left: 10px; vertical-align: middle;
+  }
+  .sa-status .dot { width: 6px; height: 6px; border-radius: 50%; background: #4F8A41; animation: bpulse 2.2s ease-out infinite; }
+
+  .sa-h2 { font-family: var(--font-display); font-weight: 400; font-size: clamp(24px, 3.2vw, 30px); margin: 46px 0 14px; }
+  .sa-p { font-size: 15px; line-height: 1.7; color: var(--ink-soft); max-width: 660px; }
+  .sa-p + .sa-p { margin-top: 12px; }
+
+  #try { scroll-margin-top: 24px; }
+  .sa-try { margin-top: 8px; }
+
+  /* ===== the request path diagram ===== */
+  .flow { margin-top: 20px; display: grid; gap: 10px; }
+  .lane-label {
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--mute); margin: 6px 0 2px;
+  }
+  .lane { display: grid; grid-template-columns: 1fr 26px 1.25fr 26px 1fr; align-items: stretch; }
+  .node {
+    background: #FBF9F1;
+    border: 1px solid var(--line-light);
+    border-radius: var(--radius-sm);
+    padding: 13px 14px;
+  }
+  .node b {
+    display: block;
+    font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--brass-deep); margin-bottom: 5px;
+  }
+  .node span { display: block; font-size: 13px; line-height: 1.5; color: var(--ink); }
+  .node--worker { background: var(--pine-950); border-color: var(--pine-950); }
+  .node--worker b { color: var(--brass-hi); }
+  .node--worker span { color: var(--cream-70); }
+  .lane--back .node:not(.node--worker) { background: rgba(194, 147, 47, 0.1); border-color: rgba(194, 147, 47, 0.4); }
+  .arr { display: flex; align-items: center; justify-content: center; color: var(--brass-deep); }
+  .arr svg { width: 16px; height: 16px; }
+
+  /* the checks inside the Worker */
+  .gates {
+    margin-top: 18px;
+    background: var(--pine-950);
+    color: var(--cream);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+  }
+  .gates-head { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--brass-hi); margin-bottom: 14px; }
+  .gate { display: grid; grid-template-columns: 30px 1fr minmax(160px, 0.8fr); gap: 12px; align-items: start; padding: 11px 0; border-top: 1px solid var(--line-dark); }
+  .gate:first-of-type { border-top: 0; }
+  .gate-n { font-family: var(--font-display); font-size: 22px; line-height: 1; color: var(--brass-hi); }
+  .gate-what { font-size: 14px; line-height: 1.55; color: var(--cream); }
+  .gate-else { font-family: var(--font-mono); font-size: 11px; line-height: 1.6; color: var(--cream-45); }
+  .gate-else em { font-style: normal; color: var(--brass-hi); }
+  .gate--pass .gate-what { color: var(--leaf); }
+  .gates-foot { margin-top: 14px; font-size: 12.5px; color: var(--cream-45); }
+
+  /* decision panel */
+  .decision {
+    margin-top: 18px;
+    border-left: 3px solid var(--brass);
+    background: var(--ivory-2);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 18px 22px;
+    max-width: 700px;
+  }
+  .decision b { display: block; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass-deep); margin-bottom: 8px; }
+  .decision p { font-size: 14.5px; line-height: 1.7; color: var(--ink-soft); }
+  .decision p + p { margin-top: 10px; }
+
+  /* rules list, same pattern as the meeting minutes page */
+  .rules { list-style: none; max-width: 680px; }
+  .rules li { display: flex; gap: 12px; align-items: flex-start; padding: 9px 0; border-bottom: 1px solid var(--line-light); font-size: 14px; line-height: 1.6; color: var(--ink-soft); }
+  .rules li:last-child { border-bottom: 0; }
+  .rules svg { width: 16px; height: 16px; flex: none; margin-top: 4px; color: #4F8A41; }
+
+  /* testing */
+  .tests { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .test { background: #FBF9F1; border: 1px solid var(--line-light); border-radius: var(--radius-sm); padding: 16px 17px; }
+  .test b { font-family: var(--font-display); font-weight: 400; font-size: 34px; line-height: 1; color: var(--brass-deep); display: block; }
+  .test i { font-style: normal; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mute); display: block; margin: 6px 0 9px; }
+  .test span { font-size: 13px; line-height: 1.55; color: var(--ink-soft); display: block; }
+
+  .limits { display: flex; flex-wrap: wrap; gap: 8px; }
+  .limits span { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.04em; color: var(--mute); border: 1px solid var(--line-light); border-radius: 999px; padding: 5px 13px; }
+
+  .sa-buildnote { margin-top: 30px; font-size: 13.5px; line-height: 1.65; color: var(--mute); max-width: 660px; }
+
+  @media (max-width: 760px) {
+    .lane { grid-template-columns: 1fr; }
+    .arr svg { transform: rotate(90deg); }
+    .arr { padding: 4px 0; }
+    .lane--back .arr svg { transform: rotate(90deg); }
+    .gate { grid-template-columns: 26px 1fr; }
+    .gate-else { grid-column: 2; }
+    .tests { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bwrap">
+  <div class="btop">
+    <a class="btop-name" href="../../">Mir Mahadi <em>Abbas</em></a>
+    <a class="bback" href="../">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+      All builds
+    </a>
+  </div>
+
+  <main class="bpage">
+    <div class="bsheet">
+      <p class="beyebrow">Build · AI-connected</p>
+      <h1>Site <em>Assistant</em><span class="sa-status"><span class="dot" aria-hidden="true"></span>Live</span></h1>
+      <p class="blead">An AI assistant that answers questions about my experience and projects. It answers only from my CV and this website, and links every answer to the part of the site it came from. It is on every page of this site, behind the button in the corner.</p>
+
+      <!-- ===================== TRY IT ===================== -->
+      <h2 class="sa-h2" id="try">Try it</h2>
+      <div class="sa-try">
+        <!-- js/assistant.js draws the live assistant here -->
+        <div id="assistant-mount"><p class="bnote">The assistant could not load. You can email me at mirabbasun@gmail.com instead.</p></div>
+      </div>
+
+      <!-- ===================== HOW A QUESTION TRAVELS ===================== -->
+      <h2 class="sa-h2">How a question travels</h2>
+      <p class="sa-p">This website is static: plain files, no server of its own. So the page cannot call the AI directly, because anything on the page is public, including an API key. The question goes through a small backend I run on Cloudflare instead, which holds the key and decides whether the question gets through at all.</p>
+
+      <div class="flow" role="img" aria-label="Request path: your browser sends the question to the Cloudflare Worker, which runs its checks and calls the Claude API with the knowledge pack. Return path: Claude streams the answer with a hidden list of sources, the Worker removes that list and keeps only sources that exist, and your browser shows the answer with source links.">
+        <p class="lane-label">The question</p>
+        <div class="lane">
+          <div class="node"><b>Your browser</b><span>Sends the question, plus the last few exchanges so follow-ups make sense</span></div>
+          <div class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+          <div class="node node--worker"><b>Cloudflare Worker</b><span>Holds the API key. Runs four checks before anything costs money</span></div>
+          <div class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+          <div class="node"><b>Claude API</b><span>Haiku model, with the whole knowledge pack as its instructions</span></div>
+        </div>
+
+        <p class="lane-label">The answer</p>
+        <div class="lane lane--back">
+          <div class="node"><b>Your browser</b><span>Shows the answer as it arrives, then adds the source links</span></div>
+          <div class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></div>
+          <div class="node node--worker"><b>Cloudflare Worker</b><span>Strips the hidden sources line and keeps only sources that really exist</span></div>
+          <div class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></div>
+          <div class="node"><b>Claude API</b><span>Streams the answer, ending with a hidden line naming the sections it used</span></div>
+        </div>
+      </div>
+
+      <div class="gates">
+        <p class="gates-head">The four checks inside the Worker, in order</p>
+        <div class="gate">
+          <span class="gate-n">1</span>
+          <span class="gate-what">Did the request come from this website?</span>
+          <span class="gate-else">If not: <em>refused</em>. Other sites cannot use it.</span>
+        </div>
+        <div class="gate">
+          <span class="gate-n">2</span>
+          <span class="gate-what">Fewer than 8 questions from this visitor in the last minute?</span>
+          <span class="gate-else">If not: <em>wait a minute</em>.</span>
+        </div>
+        <div class="gate">
+          <span class="gate-n">3</span>
+          <span class="gate-what">Is the question a sensible size, and the conversation in the right shape?</span>
+          <span class="gate-else">If not: <em>refused</em> before any cost.</span>
+        </div>
+        <div class="gate">
+          <span class="gate-n">4</span>
+          <span class="gate-what">Is the site still under its daily limit of questions?</span>
+          <span class="gate-else">If not: <em>email Mir instead</em>.</span>
+        </div>
+        <div class="gate gate--pass">
+          <span class="gate-n">&#10003;</span>
+          <span class="gate-what">Only now does the Worker call Claude.</span>
+          <span class="gate-else">The one step that costs money.</span>
+        </div>
+        <p class="gates-foot">Behind all four sits a monthly spend limit set with the AI provider, so the worst case is the assistant switching off for the day, not a large bill.</p>
+      </div>
+
+      <!-- ===================== WHAT IT KNOWS ===================== -->
+      <h2 class="sa-h2">What it knows, and how</h2>
+      <p class="sa-p">Everything the assistant knows is in one file I wrote by hand from my CV and this website: about twenty short sections, one per role, project or topic, each with an id and a link back to the page it describes. The whole file goes to the model with every question, as its instructions. The model is told to answer from that file and nothing else, and to finish each answer by naming the sections it used. Those names are what turn into the source links under each answer.</p>
+      <p class="sa-p">Where my CV and this site disagreed on a detail, the file follows the site or leaves the detail out, so the assistant cannot contradict the page you are reading.</p>
+
+      <div class="decision">
+        <b>Why there is no vector database</b>
+        <p>The usual way to build this is retrieval: split the documents into chunks, store them as embeddings in a vector database, and fetch the few most similar chunks for each question. That is the right tool when there is too much text to send with every question.</p>
+        <p>There is not, here. Everything true about me fits comfortably in the model's instructions, and the provider caches those instructions between questions, so sending all of it is cheap. Retrieval would add a database, a second service and a new way to fail, and could still fetch the wrong chunk. Sending everything means the model always sees all of it.</p>
+      </div>
+
+      <!-- ===================== RULES ===================== -->
+      <h2 class="sa-h2">Built not to bluff</h2>
+      <ul class="rules">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Answers only from the knowledge file. If the answer is not there, it says so and points you to my email rather than guessing.</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Talks about me in the third person and will not speak as me, even if asked to.</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Salary, notice period, reasons for leaving and references are handed straight to me, with my email.</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Does not judge whether I suit a role. It describes the evidence and leaves the judgement to you.</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Treats what you type as a question, not as instructions, so "ignore your rules" does not work.</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>A source link only appears if the section it names really exists, so the model cannot invent a citation.</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Answers are shown as plain text. Nothing the model writes can become a link or code on the page.</li>
+      </ul>
+
+      <!-- ===================== TESTING ===================== -->
+      <h2 class="sa-h2">How it is tested</h2>
+      <div class="tests">
+        <div class="test"><b>49</b><i>Plumbing checks</i><span>Run against a stand-in for the AI, so they cost nothing. They check the limits, the refusals, the hidden sources line at every possible split point, and that the key never reaches the browser.</span></div>
+        <div class="test"><b>21</b><i>Behaviour checks</i><span>Real questions to the real model, after every change to what it knows: questions it should answer, ones it must not invent an answer to, ones it must hand to me, and attempts to break its rules.</span></div>
+        <div class="test"><b>1</b><i>Daily health check</i><span>Each morning the Worker makes one tiny call and records the result, so an expired key shows up straight away instead of as a quietly broken page.</span></div>
+      </div>
+
+      <!-- ===================== LIMITS ===================== -->
+      <h2 class="sa-h2">Honest limits</h2>
+      <div class="limits">
+        <span>It can still be wrong: check the source link</span>
+        <span>Knows only what the file says</span>
+        <span>Remembers the conversation in this tab only</span>
+        <span>A daily limit on questions</span>
+        <span>English only</span>
+      </div>
+
+      <p class="bnote">Your questions are sent to Anthropic's Claude API to generate the answer. This site keeps no record of them, and the Worker logs nothing you type. Please do not include personal information in a question.</p>
+
+      <p class="sa-buildnote">Designed and built by Mir. Stack: a Cloudflare Worker (rate limiting, Workers KV for the daily limit and health check, a daily scheduled check), the Anthropic Claude API (Haiku) with prompt caching and streamed responses, and a single self-contained JavaScript file that adds the assistant to every page of this site. No framework, no vector database.</p>
+    </div>
+  </main>
+
+  <footer class="bfoot">
+    <span>&copy; <span id="year"></span> Mir Mahadi Abbas</span>
+    <a href="../../">mirmahadiabbas.com</a>
+  </footer>
+</div>
+
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+<!-- The site assistant: draws itself into #assistant-mount above. -->
+<script src="../../js/assistant.js"></script>
+</body>
+</html>
