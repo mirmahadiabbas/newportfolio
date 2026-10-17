@@ -125,6 +125,7 @@
 
   function renderAssistant() {
     var a = SITE.assistant;
+    if (!a) return '';
     var points = a.points.map(function (p) {
       return '<li>' + esc(p) + '</li>';
     }).join('');
@@ -391,8 +392,21 @@
     contact: renderContact
   };
 
+  // Each section is built on its own, so a problem in one section can
+  // never blank the whole page: that section is skipped and the error is
+  // reported (on screen too, if the address ends in ?debug=1).
+  var failed = [];
   app.innerHTML = SITE.sections.map(function (name) {
-    return BUILDERS[name] ? BUILDERS[name]() : '';
+    if (!BUILDERS[name]) return '';
+    try { return BUILDERS[name](); }
+    catch (e) {
+      failed.push(name + ': ' + (e && e.message ? e.message : e));
+      if (window.console) console.error('Section "' + name + '" could not be drawn:', e);
+      return '';
+    }
   }).join('');
+  if (failed.length && typeof window.__siteError === 'function') {
+    failed.forEach(function (f) { window.__siteError('render.js, section ' + f); });
+  }
 
 })();
