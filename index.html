@@ -14,6 +14,39 @@
 <meta property="og:image" content="headshot.jpg">
 <meta name="twitter:card" content="summary">
 
+<!-- Debug switch: open the site with ?debug=1 on the end of the address
+     and any script error is shown at the top of the page, so problems on
+     a phone can be read without developer tools. Does nothing otherwise. -->
+<script>
+(function () {
+  var on = /[?&]debug=1/.test(location.search);
+  var box = null;
+  window.__siteError = function (msg) {
+    if (!on) return;
+    if (!box) {
+      box = document.createElement('pre');
+      box.style.cssText = 'position:fixed;left:8px;right:8px;top:8px;z-index:9999;margin:0;padding:12px 14px;background:#fff3cd;color:#3a2a00;border:2px solid #C2932F;border-radius:8px;font:12px/1.5 monospace;white-space:pre-wrap;max-height:60vh;overflow:auto';
+      box.textContent = 'Errors on this page:\n';
+      (document.body || document.documentElement).appendChild(box);
+    }
+    box.textContent += '\n- ' + msg;
+  };
+  window.addEventListener('error', function (e) {
+    var t = e.target;
+    if (t && t !== window && (t.tagName === 'SCRIPT' || t.tagName === 'LINK')) {
+      window.__siteError('could not load ' + (t.src || t.href));   // a file failed to download
+      return;
+    }
+    if (!e.message) return;                                        // images and the like: ignore
+    var where = e.filename ? e.filename.split('/').pop() + ':' + e.lineno : 'unknown file';
+    window.__siteError(where + '  ' + e.message);
+  }, true);
+  if (on) window.addEventListener('load', function () {
+    if (!box) window.__siteError('none. Every script loaded and ran. (' + navigator.userAgent + ')');
+  });
+})();
+</script>
+
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,10 +54,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <!-- Styles. tokens.css holds every colour and font; start there for look changes. -->
-<link rel="stylesheet" href="css/tokens.css">
-<link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/components.css">
-<link rel="stylesheet" href="css/sections.css">
+<link rel="stylesheet" href="css/tokens.css?v=20261016">
+<link rel="stylesheet" href="css/base.css?v=20261016">
+<link rel="stylesheet" href="css/components.css?v=20261016">
+<link rel="stylesheet" href="css/sections.css?v=20261016">
 
 <script type="application/ld+json">
 {
@@ -104,11 +137,22 @@
 </div>
 
 <!-- Content first, then the builder, then behaviour. Order matters. -->
-<script src="js/data.js"></script>
-<script src="js/render.js"></script>
-<script src="js/main.js"></script>
+<script src="js/data.js?v=20261016"></script>
+<script src="js/render.js?v=20261016"></script>
+<script src="js/main.js?v=20261016"></script>
+<!-- Safety net: content fades in as you scroll (main.js). If that ever fails
+     to start on a visitor's browser, show everything after two seconds
+     rather than leaving the page blank. Does nothing when main.js works. -->
+<script>
+setTimeout(function () {
+  if (document.querySelector('.reveal.in')) return;
+  var all = document.querySelectorAll('.reveal');
+  for (var i = 0; i < all.length; i++) all[i].classList.add('in');
+  if (typeof window.__siteError === 'function') window.__siteError('the fade-in effect did not start, so all content was shown directly');
+}, 2000);
+</script>
 <!-- The site assistant: draws the Ask section and the corner button.
      Optional: if it fails to load, the rest of the page is unaffected. -->
-<script src="js/assistant.js"></script>
+<script src="js/assistant.js?v=20261016"></script>
 </body>
 </html>
